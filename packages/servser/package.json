@@ -2,9 +2,15 @@
   "name": "@manondo/servser",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "module":"dist/cjs-index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "buildOptions": {
+    "formats": [
+      "cjs"
+    ]
   },
   "repository": {
     "type": "git",

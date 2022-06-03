@@ -2,9 +2,16 @@
   "name": "@manondo/vue",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/es-index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "buildOptions": {
+    "formats": [
+      "es",
+      "cjs"
+    ]
   },
   "repository": {
     "type": "git",
