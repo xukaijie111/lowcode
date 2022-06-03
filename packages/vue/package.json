@@ -1,27 +1,27 @@
 {
   "name": "@manondo/vue",
-  "version": "1.0.0",
-  "description": "",
+  "private": true,
+  "version": "0.0.0",
   "main": "dist/es-index.js",
   "types": "dist/index.d.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "buildOptions": {
     "formats": [
       "es",
       "cjs"
     ]
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/xukaijie111/ManonDo.git"
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/xukaijie111/ManonDo/issues"
+  "dependencies": {
+    "vue": "^3.2.25"
   },
-  "homepage": "https://github.com/xukaijie111/ManonDo#readme"
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.3.3",
+    "typescript": "^4.5.4",
+    "vite": "^2.9.9",
+    "vue-tsc": "^0.34.7"
+  }
 }
