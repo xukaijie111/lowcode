@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "preinstall": "node ./scripts/preinstall.js",
-    "dev:vue": "node ./scripts/dev vue"
+    "dev:vue": "npm --prefix ./packages/vue run dev"
   },
   "repository": {
     "type": "git",
