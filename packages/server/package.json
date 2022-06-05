@@ -7,11 +7,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "buildOptions": {
-    "formats": [
-      "cjs"
-    ]
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xukaijie111/ManonDo.git"
