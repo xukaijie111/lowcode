@@ -4,10 +4,12 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import router from './router'
 import './assets/css/main.css';
+import "@manondo/editor/index.css"
 
 const app = createApp(App)
 
 app
 .use(ElementPlus)
-    .use(router)
+//@ts-ignore
+    .use(router) 
     .mount('#app')
