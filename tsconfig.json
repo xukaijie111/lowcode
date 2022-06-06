@@ -20,7 +20,7 @@
     "types": ["jest", "puppeteer", "node"],
     "rootDir": ".",
     "paths": {
-      "@manonDo/*": ["packages/*"],
+      "@manondo/*": ["packages/*/src"],
     }
   },
   "include": [

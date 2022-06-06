@@ -2,6 +2,7 @@ import request from './request';
 
 
 import { ElMessage } from "element-plus";
+import { AxiosPromise } from 'axios';
 
 
 interface Param {
@@ -10,11 +11,12 @@ interface Param {
     data?:Record<any,any>
 }
 
+export type IResponse = any
 
-const apiRequest = (param:Param,option = {showError:true})=>{
+const apiRequest = (param:Param,option = {showError:true}) => {
     return request(param)
     .then((res)=>{
-        return res;
+        return res
     },(err)=>{
       if (err && err.errorMsg && option.showError) {
       
