@@ -2,7 +2,6 @@ import request from './request';
 
 
 import { ElMessage } from "element-plus";
-import { AxiosPromise } from 'axios';
 
 
 interface Param {

@@ -5,6 +5,19 @@
   "scripts": {
     "start": "node ./bin/www"
   },
+  "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-decorators": "^7.14.5",
+    "@babel/plugin-transform-runtime": "^7.12.1",
+    "@babel/types": "^7.12.0",
+    "@babel/parser": "^7.18.4",
+    "@babel/traverse": "^7.18.2",
+    "@babel/cli": "^7.14.8",
+    "@babel/core": "^7.14.8",
+    "@babel/eslint-parser": "^7.17.0",
+    "@babel/node": "^7.14.7",
+    "magic-string": "^0.26.2"
+  },
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",

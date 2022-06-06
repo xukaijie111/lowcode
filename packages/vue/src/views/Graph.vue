@@ -56,14 +56,14 @@
         <div class="content-wrap">
             <div class="left">
                 <el-menu default-active="1" class="el-menu-vertical-demo">
-                    <el-submenu v-for="item in menus" :index="item.id" :key="item.id">
+                    <el-sub-menu v-for="item in menus" :index="item.id" :key="item.id">
                         <template #title>
                             <span>{{ item.category }}</span>
                         </template>
                         <el-menu-item-group v-for="subItem in item.children" :index="subItem.id" :key="subItem.id">
                             <Cell :subItem="subItem" />
                         </el-menu-item-group>
-                    </el-submenu>
+                    </el-sub-menu>
                 </el-menu>
             </div>
 
