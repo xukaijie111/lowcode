@@ -1,0 +1,58 @@
+
+.manondo-node-body{
+    cursor: move;
+    fill:white;
+    stroke-width: 2;
+    stroke: #666 !important;
+}
+.manondo-node-body-selected{
+    stroke-width: 2;
+    stroke: #ff7f0e !important;
+}
+
+.manondo-grid line {
+    fill: none;
+    shape-rendering: crispEdges;
+    stroke: #eee;
+    stroke-width: 1px;
+}
+
+.manondo-node-text {
+    stroke: #333;
+    text-anchor: middle;
+    dominant-baseline:middle;
+    font-size: 14px;
+    pointer-events: none;
+    font-weight: 100;;
+}
+
+.manondo-node-port {
+    stroke: #999;
+    stroke-width: 1;
+    fill: #d9d9d9;
+    cursor: crosshair;
+}
+.manondo-node-port:hover {
+    stroke-width: 2;
+    stroke: #ff7f0e !important;
+}
+.manondo-node-port-selected{
+    stroke-width: 2;
+    stroke: #ff7f0e !important;
+}
+
+
+.manondo-link-line{
+    stroke: #999;
+    stroke-width: 3;
+    fill: none;
+    pointer-events: none;
+}
+.manondo-link-background{
+    stroke: transparent;
+    stroke-width: 10;
+    fill: none;
+}
+.manondo-link-line-selected{
+    stroke:orange
+}

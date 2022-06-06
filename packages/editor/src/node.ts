@@ -104,9 +104,9 @@ export class Node extends Cell {
 export namespace Node {
     export interface Options extends Cell.Options { };
     export const refStyle = {
-        body_selected: "chart-node-body chart-node-body-selected",
-        body_unselected: "chart-node-body",
-        port_selected: "cahrt-node-port cahrt-node-port-selected",
-        port_unselected: "cahrt-node-port"
+        body_selected: "manondo-node-body manondo-node-body-selected",
+        body_unselected: "manondo-node-body",
+        port_selected: "manondo-node-port manondo-node-port-selected",
+        port_unselected: "manondo-node-port"
     }
 }

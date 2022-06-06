@@ -26,18 +26,20 @@ export class Cell extends Event {
         if (!options.id) {
             options.id = generateId();
         }
+        this.graph = options.graph;
         this.options = options
         this.id = options.id;
-        this.drawContainer();
+        this.g = this.drawContainer();
         this.drawBody();
         this.drawContext();
     }
 
     protected drawContainer() {
         let [x,y] = this.options.attrs.position
-        this.g = document.createElementNS("http://www.w3.org/2000/svg",'g');
+        let g = document.createElementNS("http://www.w3.org/2000/svg",'g');
         d3.select(this.g)
         .attr('transform',`translate(${x},${y})`)    
+        return  g
     }
 
     protected append(ele:SVGElement) {
@@ -89,6 +91,15 @@ export class Cell extends Event {
     }
 
     
+    onMouseDown() {
+        this.emit('cell:mousedown',{ cell: this })
+    }
+
+
+    onDbClick() {
+        this.graph.emit('cell:dbClick')
+    }
+
 
 
 }
