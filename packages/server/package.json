@@ -3,19 +3,19 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "ts-node ./bin/www"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/plugin-proposal-decorators": "^7.14.5",
-    "@babel/plugin-transform-runtime": "^7.12.1",
-    "@babel/types": "^7.12.0",
-    "@babel/parser": "^7.18.4",
-    "@babel/traverse": "^7.18.2",
     "@babel/cli": "^7.14.8",
     "@babel/core": "^7.14.8",
     "@babel/eslint-parser": "^7.17.0",
     "@babel/node": "^7.14.7",
+    "@babel/parser": "^7.18.4",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-decorators": "^7.14.5",
+    "@babel/plugin-transform-runtime": "^7.12.1",
+    "@babel/traverse": "^7.18.2",
+    "@babel/types": "^7.12.0",
     "magic-string": "^0.26.2"
   },
   "dependencies": {
@@ -27,6 +27,7 @@
     "http-errors": "~1.6.3",
     "lodash": "^4.17.21",
     "mongodb": "^4.6.0",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "ts-node": "^10.8.1"
   }
 }

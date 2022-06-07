@@ -1,3 +1,4 @@
+export {}
 let _ = require('lodash');
 let {
     parse
@@ -8,7 +9,7 @@ const execa = require('execa')
 
 
 
-let {
+const {
     DSL_BASE_URL,
     CELL_TYPE_START
 } = require('../common/const')
@@ -59,6 +60,7 @@ async function generateCodeByDsl(config) {
         }
 
         async function _parse(code) {
+            let ast;
 
             try {
                 ast = parse(code, {
@@ -83,7 +85,7 @@ async function generateCodeByDsl(config) {
         }
 
         fse.removeSync(directory);
-        for (node of nodes) {
+        for (let node of nodes) {
             let {
                 name,
                 id,

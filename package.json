@@ -6,7 +6,7 @@
   "scripts": {
     "preinstall": "node ./scripts/preinstall.js",
     "dev:vue": "npm --prefix ./packages/vue run dev",
-    "dev:server":"npm --prefix ./packages/server run start"
+    "dev:server": "npm --prefix ./packages/server run start"
   },
   "repository": {
     "type": "git",
@@ -53,7 +53,7 @@
     "csstype": "^3.0.3",
     "enquirer": "^2.3.2",
     "eslint": "^7.7.0",
-    "execa": "^4.0.2",
+    "execa": "^4.1.0",
     "fs-extra": "^9.0.1",
     "jest": "^27.1.0",
     "lint-staged": "^10.2.10",
@@ -79,11 +79,11 @@
     "yorkie": "^2.0.0"
   },
   "dependencies": {
+    "@manondo/editor": "workspace:*",
+    "@manondo/shared": "workspace:*",
     "@types/lodash": "^4.14.182",
     "axios": "^0.27.2",
     "d3": "^7.4.4",
-    "mousetrap": "^1.6.5",
-    "@manondo/editor": "workspace:*",
-    "@manondo/shared": "workspace:*"
+    "mousetrap": "^1.6.5"
   }
 }

@@ -1,4 +1,4 @@
-
+export {}
 let MagicString = require('magic-string')
 
 const {
