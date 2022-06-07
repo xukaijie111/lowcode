@@ -1,5 +1,10 @@
 
+export {}
 const babel = require('@babel/core');
+
+interface ICatchError {
+    message:string
+}
 
 function generateId(len = 10){
     let s = ""
@@ -9,7 +14,7 @@ function generateId(len = 10){
     return s
 }
 
-function tryTransformCode(source) {
+function tryTransformCode(source:string) {
     try{
         babel.transformSync(source, {
             plugins: [['@babel/plugin-proposal-decorators', { legacy: true }], ['@babel/plugin-proposal-class-properties']],
@@ -21,7 +26,7 @@ function tryTransformCode(source) {
     }catch(err) {
         return {
             success:false,
-            errorMsg:err.message
+            errorMsg:(err as ICatchError).message
         }
     }
 

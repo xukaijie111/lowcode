@@ -106,10 +106,18 @@
     .graph-wrap {
         width: 100%;
         height: 100%;
+        display: flex;
+        flex-direction: column;
+        .content-wrap {
+           flex: 1;
+           height: 0px;
+           display: flex;
+           .wrap{
+               flex: 1;
+               width: 0px;
+               position: relative;
+           }
 
-        .container {
-            width: 500px;
-            height: 500px
         }
     }
 </style>
