@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "preinstall": "node ./scripts/preinstall.js",
+    "postinstall": "npm --prefix ./server install",
     "dev:vue": "npm --prefix ./packages/vue run dev",
-    "dev:server": "npm --prefix ./packages/server run start"
+    "dev:server": "npm --prefix ./server run start",
+    "clean": "node ./scripts/clean.js"
   },
   "repository": {
     "type": "git",
@@ -19,19 +21,6 @@
     "url": "https://github.com/xukaijie111/ManonDo/issues"
   },
   "homepage": "https://github.com/xukaijie111/ManonDo#readme",
-  "gitHooks": {
-    "pre-commit": "lint-staged",
-    "commit-msg": "node scripts/verifyCommit.js"
-  },
-  "lint-staged": {
-    "*.js": [
-      "prettier --write"
-    ],
-    "*.ts?(x)": [
-      "eslint",
-      "prettier --parser=typescript --write"
-    ]
-  },
   "engines": {
     "node": ">=16.5.0"
   },
@@ -85,6 +74,7 @@
     "awilix": "^7.0.3",
     "axios": "^0.27.2",
     "d3": "^7.4.4",
-    "mousetrap": "^1.6.5"
+    "mousetrap": "^1.6.5",
+    "rimraf": "^3.0.2"
   }
 }

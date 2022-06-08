@@ -1,9 +1,9 @@
 
 import { App } from './app';
 import { ProcessController } from './controllers/process.controller';
-import  { Mongodb } from './mongo/index';
+import  { Mongodb }  from './mongo/index';
 import { Controller } from './controllers/base.controller'
-import awilix  from 'awilix'
+import * as awilix  from 'awilix'
 
 const container = awilix.createContainer({
     injectionMode: awilix.InjectionMode.PROXY
@@ -26,4 +26,4 @@ const app = new App( {
     mongodb: container.resolve<Mongodb>('Mongodb')
 });
 
-app.listen();
+//app.listen();

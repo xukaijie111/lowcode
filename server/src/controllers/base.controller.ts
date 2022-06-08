@@ -8,3 +8,4 @@ export namespace Controller {
         router:Router
     }
 }
+
