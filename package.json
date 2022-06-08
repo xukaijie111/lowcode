@@ -68,10 +68,8 @@
     "yorkie": "^2.0.0"
   },
   "dependencies": {
-    "@manondo/editor": "workspace:*",
     "@manondo/shared": "workspace:*",
     "@types/lodash": "^4.14.182",
-    "awilix": "^7.0.3",
     "axios": "^0.27.2",
     "d3": "^7.4.4",
     "mousetrap": "^1.6.5",

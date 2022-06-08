@@ -10,20 +10,18 @@ const container = awilix.createContainer({
 })
 
 container.register({
-    ProcessController: awilix.asClass(ProcessController).setLifetime(awilix.Lifetime.SINGLETON),
-    Mongodb:awilix.asClass(Mongodb).setLifetime(awilix.Lifetime.SINGLETON)
+    processController: awilix.asClass(ProcessController).setLifetime(awilix.Lifetime.SINGLETON),
+    mongodb:awilix.asClass(Mongodb).setLifetime(awilix.Lifetime.SINGLETON)
 })
+
+let mongodb = container.resolve<Mongodb>('mongodb');
   
+mongodb.init()
+.then(() => {
+    new App( {
+        controllers:[
+            container.resolve<Controller.Meta>('processController')
+        ] as Controller.Meta[]
+    });
+})
 
-
-const app = new App( {
-
-    controllers:[
-        container.resolve<Controller.Meta>('ProcessController')
-    ] as Controller.Meta[],
-
-
-    mongodb: container.resolve<Mongodb>('Mongodb')
-});
-
-//app.listen();

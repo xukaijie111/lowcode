@@ -18,18 +18,15 @@ export class App {
 
    constructor({
     controllers,
-    mongodb
   }:App.options) {
     
     this.app = express();
 
-    this.connectToTheDatabase(mongodb)
-    .then(()=>{
       this.initializeMiddlewares();
       this.initializeControllers(controllers);
       this.initializeErrorHandling();
       this.listen();
-    })
+    
    
   }
 
@@ -58,16 +55,11 @@ export class App {
       this.app.use('/', controller.router);
     });
   }
-
-  private async connectToTheDatabase(mongodb:Mongodb) {
-    await mongodb.init();
-  }
 }
 
 
 export namespace App {
     export type options = {
-        controllers:Controller.Meta[],
-        mongodb:Mongodb
+        controllers:Controller.Meta[]
     }
 }

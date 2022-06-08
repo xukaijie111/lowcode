@@ -1,6 +1,4 @@
 <script setup lang="ts">
-    import * as d3 from 'd3'
-
     const props = defineProps({
         subItem: {
             type: Object,
@@ -11,18 +9,21 @@
     const getClass = () => {
             let {
                 shape
-            } = props.subItem;
-            let param = {}
+            } = props.subItem ;
+            let param:Record<any,any> = {}
             param[shape] = true
             return param
     }
 
-     const ondragstart = (event) => {
+     const ondragstart = (event:DragEvent) => {
+       
         // 鼠标点击节点的相对位置
+        //@ts-ignore
         let { layerX,layerY } = event;
-        let id = this.subItem.id;
+
+        let id = props.subItem.id;
         let data = `${id}-${layerX}-${layerY}`
-        event.dataTransfer.setData("data", data) ;
+        event.dataTransfer!.setData("data", data) ;
      // event.preventDefault();
     }
 </script>
@@ -41,42 +42,6 @@
     </div>
 </template>
 
-<script>
-    import * as d3 from 'd3'
-    export default {
-        name: "Cell",
-
-        props: {
-            subItem: {
-                type: Object,
-                default: {},
-            },
-        },
-
-        methods: {
-            getClass() {
-                let {
-                    shape
-                } = this.subItem;
-                let param = {}
-                param[shape] = true
-                return param
-            },
-
-            ondragstart(event) {
-                // 鼠标点击节点的相对位置
-                let {
-                    layerX,
-                    layerY
-                } = event;
-                let id = this.subItem.id;
-                let data = `${id}-${layerX}-${layerY}`
-                event.dataTransfer.setData("data", data);
-                // event.preventDefault();
-            },
-        },
-    };
-</script>
 
 <style lang="less" scoped>
     .menu-node {

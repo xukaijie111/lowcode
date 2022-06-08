@@ -1,10 +1,10 @@
 
-import { Request } from './request';
+import { Request , request} from './request';
 
-class Process {
+export class Process{
     request:Request
-    constructor(options:Process.options) {
-        this.request = options.request;
+    constructor() {
+        this.request = request;
     }
 
     getList(data:Process.getListBody) {
@@ -15,16 +15,12 @@ class Process {
         }
         return this.request.post(config)
     }
-
-
 }
 
+export const process = new Process();
 
 
 export namespace Process {
-    export type options = {
-        request:Request
-    }
 
     export interface postConfig<T> {
         url:string,

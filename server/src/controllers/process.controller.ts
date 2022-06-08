@@ -9,14 +9,14 @@ export  class ProcessController {
     private processCollect:Collection
 
     constructor({
-        Mongodb
+        mongodb
     }:ProcessController.options) {
-        this.processCollect = Mongodb.getCollection('process');
+        this.processCollect = mongodb.getCollection('process');
         this.initializeRoutes();
 
     }
     private initializeRoutes() {
-        this.router.get(`${this.path}/list`, this.getProcessList);
+        this.router.post(`${this.path}/getList`, this.getProcessList.bind(this));
         // this.router
         //   .post(this.path, authMiddleware, validationMiddleware(CreatePostDto), this.createPost);
     }
@@ -52,6 +52,6 @@ export  class ProcessController {
 
 export namespace ProcessController {
     export type options = {
-        Mongodb:Mongodb
+        mongodb:Mongodb
     }
 }

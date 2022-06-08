@@ -93,6 +93,8 @@ export class Request {
 
 }
 
+export const request = new Request();
+
 export namespace Request {
     export type options = {
         baseURL: string,

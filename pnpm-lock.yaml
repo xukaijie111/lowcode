@@ -4,7 +4,6 @@ importers:
 
   .:
     specifiers:
-      '@manondo/editor': workspace:*
       '@manondo/shared': workspace:*
       '@microsoft/api-extractor': ^7.15.1
       '@rollup/plugin-commonjs': ^18.0.0
@@ -51,10 +50,10 @@ importers:
       ts-jest: ^27.0.5
       tslib: ^2.3.1
       typescript: ^4.2.2
+      url: ^0.11.0
       vite: ^2.6.0
       yorkie: ^2.0.0
     dependencies:
-      '@manondo/editor': link:packages/editor
       '@manondo/shared': link:packages/shared
       '@types/lodash': registry.npmmirror.com/@types/lodash/4.14.182
       awilix: 7.0.3
@@ -62,6 +61,7 @@ importers:
       d3: registry.npmmirror.com/d3/7.4.4
       mousetrap: registry.npmmirror.com/mousetrap/1.6.5
       rimraf: 3.0.2
+      url: 0.11.0
     devDependencies:
       '@microsoft/api-extractor': registry.npmmirror.com/@microsoft/api-extractor/7.24.2
       '@rollup/plugin-commonjs': registry.npmmirror.com/@rollup/plugin-commonjs/18.1.0_rollup@2.38.5
@@ -743,6 +743,21 @@ packages:
     engines: {node: '>=8.6'}
     dev: false
 
+  /punycode/1.3.2:
+    resolution: {integrity: sha512-RofWgt/7fL5wP1Y7fxE7/EmTLzQVnB0ycyibJ0OOHIlJqTNzglYFxVwETOcIoJqJmpDXJ9xImDv+Fq34F/d4Dw==}
+    dev: false
+
+  /punycode/2.1.1:
+    resolution: {integrity: sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==}
+    engines: {node: '>=6'}
+    dev: true
+
+  /querystring/0.2.0:
+    resolution: {integrity: sha512-X/xY82scca2tau62i9mDyU9K+I+djTMUsvwf7xnUX5GLvVzgJybOJf4Y6o9Zx3oJK/LSXg5tTZBjwzqVPaPO2g==}
+    engines: {node: '>=0.4.x'}
+    deprecated: The querystring API is considered Legacy. new code should use the URLSearchParams API instead.
+    dev: false
+
   /queue-microtask/1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
     dev: false
@@ -845,6 +860,13 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /url/0.11.0:
+    resolution: {integrity: sha1-ODjpfPxgUh63PFJajlW/3Z4uKPE=}
+    dependencies:
+      punycode: 1.3.2
+      querystring: 0.2.0
+    dev: false
 
   /v8-compile-cache-lib/3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
@@ -10151,7 +10173,7 @@ packages:
     version: 2.1.0
     engines: {node: '>=8'}
     dependencies:
-      punycode: registry.npmmirror.com/punycode/2.1.1
+      punycode: 2.1.1
     dev: true
 
   registry.npmmirror.com/tr46/3.0.0:
