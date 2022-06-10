@@ -1,0 +1,28 @@
+{
+    "name": "@manondo/editor",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/es-index.js",
+    "module":"dist/cjs-index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "buildOptions": {
+      "formats": [
+        "es"
+      ]
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/xukaijie111/ManonDo.git"
+    },
+    "keywords": [],
+    "author": "bajie",
+    "license": "ISC",
+    "bugs": {
+      "url": "https://github.com/xukaijie111/ManonDo/issues"
+    },
+    "homepage": "https://github.com/xukaijie111/ManonDo#readme"
+  }
+  

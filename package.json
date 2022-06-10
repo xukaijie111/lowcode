@@ -1,5 +1,5 @@
 {
-  "name": "ManonDo",
+  "name": "manondo",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -15,7 +15,7 @@
     "url": "git+https://github.com/xukaijie111/ManonDo.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "bajie",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/xukaijie111/ManonDo/issues"
@@ -73,6 +73,7 @@
     "axios": "^0.27.2",
     "d3": "^7.4.4",
     "mousetrap": "^1.6.5",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "utility-types": "^3.10.0"
   }
 }

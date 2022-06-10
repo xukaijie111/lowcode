@@ -1,20 +1,15 @@
 
 
 <script lang="ts" setup>
-    import { ref } from 'vue';
     import Cell from './Cell.vue'
-    let menus = ref([
-        {
-            name:"普通元件",
-            children:[
-                {
-                    name:"common",
-                    shape:"rectangle"
-                }
-            ]
-        }
-    ])
 
+      defineProps({
+        menus: {
+            type: Object,
+            default: {},
+        }
+    })
+   
 </script>
 
 <template>

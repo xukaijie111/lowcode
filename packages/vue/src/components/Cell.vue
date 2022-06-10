@@ -22,7 +22,7 @@
         let { layerX,layerY } = event;
 
         let id = props.subItem.id;
-        let data = `${id}-${layerX}-${layerY}`
+        let data = `${id}`
         event.dataTransfer!.setData("data", data) ;
      // event.preventDefault();
     }
