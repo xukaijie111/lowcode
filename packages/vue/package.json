@@ -11,7 +11,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@antv/x6": "^1.32.3",
     "element-plus": "^2.2.4",
     "less": "^4.1.2",
     "vue": "^3.2.25",

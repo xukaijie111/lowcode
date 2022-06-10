@@ -1,23 +1,31 @@
 
-.manondo-node-body{
+
+.mangodo-container-wrap{
+    width:100%;
+    height:100%;
+}
+
+.mangodo-node-body{
     cursor: move;
     fill:white;
     stroke-width: 2;
     stroke: #666 !important;
 }
-.manondo-node-body-selected{
+.mangodo-node-body-selected{
     stroke-width: 2;
     stroke: #ff7f0e !important;
 }
 
-.manondo-grid line {
+
+
+.mangodo-grid line {
     fill: none;
     shape-rendering: crispEdges;
     stroke: #eee;
     stroke-width: 1px;
 }
 
-.manondo-node-text {
+.mangodo-node-text {
     stroke: #333;
     text-anchor: middle;
     dominant-baseline:middle;
@@ -26,33 +34,39 @@
     font-weight: 100;;
 }
 
-.manondo-node-port {
+.cahrt-node-port {
     stroke: #999;
     stroke-width: 1;
     fill: #d9d9d9;
     cursor: crosshair;
 }
-.manondo-node-port:hover {
+.cahrt-node-port:hover {
     stroke-width: 2;
     stroke: #ff7f0e !important;
 }
-.manondo-node-port-selected{
+.cahrt-node-port-selected{
     stroke-width: 2;
     stroke: #ff7f0e !important;
 }
 
 
-.manondo-link-line{
+.mangodo-link-line{
     stroke: #999;
     stroke-width: 3;
     fill: none;
     pointer-events: none;
 }
-.manondo-link-background{
+.mangodo-link-background{
     stroke: transparent;
     stroke-width: 10;
     fill: none;
 }
-.manondo-link-line-selected{
+.mangodo-link-line-selected{
     stroke:orange
+}
+
+.manodo-view-wrap{
+    width: 100%;
+    height: 100%;
+    overflow: auto;
 }

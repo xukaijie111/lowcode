@@ -36,17 +36,6 @@ const packageConfigs = process.env.PROD_ONLY
   ? []
   : packageFormats.map(format => createConfig(format, outputConfigs[format]))
 
-if (process.env.NODE_ENV === 'production') {
-  packageFormats.forEach(format => {
-    if (packageOptions.prod === false) {
-      return
-    }
-    if (format === 'cjs') {
-      packageConfigs.push(createProductionConfig(format))
-    }
-  })
-}
-
 export default packageConfigs
 
 function createConfig(format, output, plugins = []) {
@@ -143,12 +132,5 @@ function createReplacePlugin(
     // @ts-ignore
     values: replacements,
     preventAssignment: true
-  })
-}
-
-function createProductionConfig(format) {
-  return createConfig(format, {
-    file: resolve(`dist/${name}.${format}.prod.js`),
-    format: outputConfigs[format].format
   })
 }

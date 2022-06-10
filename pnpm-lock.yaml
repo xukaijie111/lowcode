@@ -27,6 +27,7 @@ importers:
       eslint: ^7.7.0
       execa: ^4.1.0
       fs-extra: ^9.0.1
+      insert-css: ^2.0.0
       jest: ^27.1.0
       lint-staged: ^10.2.10
       lodash: ^4.17.21
@@ -57,6 +58,7 @@ importers:
       '@types/lodash': registry.npmmirror.com/@types/lodash/4.14.182
       axios: registry.npmmirror.com/axios/0.27.2
       d3: registry.npmmirror.com/d3/7.4.4
+      insert-css: 2.0.0
       mousetrap: registry.npmmirror.com/mousetrap/1.6.5
       rimraf: 3.0.2
       utility-types: 3.10.0
@@ -555,6 +557,10 @@ packages:
 
   /inherits/2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
+
+  /insert-css/2.0.0:
+    resolution: {integrity: sha512-xGq5ISgcUP5cvGkS2MMFLtPDBtrtQPSFfC6gA6U8wHKqfjTIMZLZNxOItQnoSjdOzlXOLU/yD32RKC4SvjNbtA==}
+    dev: false
 
   /make-dir/2.1.0:
     resolution: {integrity: sha512-LS9X+dc8KLxXCb8dni79fLIIUA5VyZoyjSMCwTluaXA0o27cCK0bhXkpgw+sTXVpPy/lSO57ilRixqk0vDmtRA==}

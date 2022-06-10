@@ -8,6 +8,7 @@
     "postinstall": "npm --prefix ./server install",
     "dev:vue": "npm --prefix ./packages/vue run dev",
     "dev:server": "npm --prefix ./server run start",
+    "dev:editor":"node ./scripts/dev editor",
     "clean": "node ./scripts/clean.js"
   },
   "repository": {
@@ -69,9 +70,11 @@
   },
   "dependencies": {
     "@manondo/shared": "workspace:*",
+    "@manondo/editor": "workspace:*",
     "@types/lodash": "^4.14.182",
     "axios": "^0.27.2",
     "d3": "^7.4.4",
+    "insert-css": "^2.0.0",
     "mousetrap": "^1.6.5",
     "rimraf": "^3.0.2",
     "utility-types": "^3.10.0"

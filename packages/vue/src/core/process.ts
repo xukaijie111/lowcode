@@ -1,25 +1,12 @@
 
 import { Request , request} from './request';
-import { Graph } from '@antv/x6'
+import { Graph } from '@manondo/editor'
 import _ from 'lodash'
 
-import { GraphMenu } from './menu'
 
-let defaultGraphOptions:Graph.Options = {
-    scroller: {
-        enabled:true
-    },
+let defaultGraphOptions =  {
     width:5000,
     height:5000,
-    grid: {
-        size: 20,
-        visible: true,
-        type: 'mesh', // 'dot' | 'fixedDot' | 'mesh'
-        args: {
-            color: '#eee', // 网格线/点颜色
-            thickness: 1,     // 网格线宽度/网格点大小
-        },
-    },
 }
 
 
@@ -40,34 +27,11 @@ export class Process{
         return this.request.post(config)
     }
 
-    public createGraph(options: Graph.Options) {
-        let graph = new Graph(_.merge(defaultGraphOptions,options))
+    public createGraph(options: Partial<Graph.Options>) {
+        let graph = new Graph(_.merge(defaultGraphOptions,options) as Graph.Options)
         this.graphList.push(graph)
         return graph
     }
-
-    public addNode(graph:Graph,cell:unknown | GraphMenu.CellItem,point:Process.point) {
-        let config = this.getNodeConfig(cell,point)
-        graph.addNode(config)
-        return 
-    }
-
-    getNodeConfig(cell:unknown,point:Process.point) {
-        let _cell = cell as GraphMenu.CellItem
-        let [x,y] = point
-        let config = {
-            shape:_cell.shape,
-            x,
-            y,
-            width:80,
-            height:30,
-            attrs:_cell.attrs
-
-        }
-
-        return config
-    }
-
 }
 
 
