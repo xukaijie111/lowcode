@@ -37,11 +37,8 @@ const props = defineProps({
 const activeNames = ref(['base'])
 
 const ondragstart = (event:DragEvent) => {
-    console.log(`###props.graph`,props.graph);
-    let view:View = props.graph.getView();
-    view.setDragCacheData({
-        type:'rect'
-    })
+    //let view:View = props.graph.getView();
+   
    // event.preventDefault();
 }
 

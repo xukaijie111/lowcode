@@ -24,7 +24,6 @@ export class View extends Event {
         let wrap = document.createElement('div')
         d3.select(wrap)
         .attr('class','manodo-view-wrap')
-        .attr('')
         ele.append(wrap);
         return wrap
     }
@@ -87,9 +86,9 @@ export class View extends Event {
         this.svg.append(grid)
     }
 
-    // 当元素拖动到view 上时，需要设置的数据,addNode 需要的数据
-    public setDragCacheData(data:View.addNodeMeta) {
 
+    public getGroup() {
+        return this.svg
     }
 }
 

@@ -4,19 +4,18 @@ import { Graph } from '../graph'
 import { KeyboardPlugin } from './Keyboard'
 import { MousePlugin } from './mouse'
 
-let plugins = [
-    KeyboardPlugin,
-    MousePlugin
+export let plugins = [
+    new KeyboardPlugin(),
+    new MousePlugin()
 ]
 
-export default plugins
 
 
 export namespace Plugin {
     export type renderOptions = {
         graph:Graph,
     }
-    export type Meta = {
+    export interface  Meta extends Record<any,any> {
         apply:<T  extends renderOptions>(args:T) => void 
     }
 }
