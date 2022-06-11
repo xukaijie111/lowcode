@@ -5,7 +5,7 @@
         <div
           class="red-ui-palette-node ui-draggable ui-draggable-handle"
           draggable="true"
-          @dragstart="ondragstart"
+          @dragstart="(event) => ondragstart(index,event)"
           v-for="(item, index) in baseNodes"
           :key="index"
           :style="{ backgroundColor: item.background }"
@@ -23,11 +23,11 @@
 </template>
 
 <script lang="ts" setup>
-import { Graph ,View} from "@manondo/editor"
+import { Graph } from "@manondo/editor"
 
 import { ref } from 'vue'
 
-const props = defineProps({
+defineProps({
   graph: {
     type: Graph,
     required: true,
@@ -36,10 +36,11 @@ const props = defineProps({
 
 const activeNames = ref(['base'])
 
-const ondragstart = (event:DragEvent) => {
-    //let view:View = props.graph.getView();
-   
-   // event.preventDefault();
+const ondragstart = (index:number,event:DragEvent) => {
+    let node = baseNodes.value[index];
+
+    console.log(`###node is `,node)
+     event.dataTransfer?.setData("data", JSON.stringify(node)) ;
 }
 
 const baseNodes = ref([

@@ -2,18 +2,19 @@ import { Graph } from "../graph";
 import * as d3 from 'd3';
 
 export class MousePlugin  {
+    graph:Graph 
     constructor() {
-
+       
     }
 
     apply({ graph }:{ graph:Graph}) {
 
-      
+        this.graph = graph;
         let view = graph.getView();
         let svg = view.getGroup();
 
         let events = MousePlugin.events;
-        console.log(`apply mouse`,events)
+
 
         for (let key in events) {
             d3.select(svg)
@@ -28,12 +29,21 @@ export class MousePlugin  {
     }
 
     dragOver = (event:MouseEvent) => {
-        console.log(`##dragover`);
         event.preventDefault();
     }
 
-    onDrop = (event:MouseEvent) => {
-        console.log(`##DROP`);
+    onDrop = (event:DragEvent) => {
+        let { graph } = this;
+        let data = event.dataTransfer?.getData("data");
+        //@ts-ignore
+        let formatData = JSON.parse(data)
+        if (graph.checkIsValidNodeType(formatData?.type)) {
+                graph.addNode({ type : formatData.type})
+        }
+
+        event.preventDefault();
+        return;
+
     }
 }
 

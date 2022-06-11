@@ -35,3 +35,7 @@ export function registerNode<T extends BasicNode> ({ type, Ctor}: {type:string,C
     shapeMap[type] = Ctor;
     return true;
 }
+
+export function getShapeMap() {
+    return shapeMap;
+}
