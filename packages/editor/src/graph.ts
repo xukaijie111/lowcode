@@ -10,7 +10,6 @@ import { Plugin, plugins as innerPlugins } from './plugins';
 import {
     getShapeMap
 } from './nodes/index'
-import { BasicNode } from './nodes/basic.node';
 
 export class Graph extends Event {
     private options: Graph.Options
@@ -48,12 +47,14 @@ export class Graph extends Event {
         return Object.keys(shape).includes(type)
     }
 
-    public addNode(metaData: Graph.GraphAddNodeMets) {
-        if (this.checkIsValidNodeType(metaData.type)) {
+    public addNode<T = unknown>(metaData: Graph.GraphAddNodeMets) {
+        console.log(`###metadata is `,metaData);
+        if (!this.checkIsValidNodeType(metaData.type)) {
             console.warn(`${metaData.type} node is not in manado/editor. you can use registerNode to register first!`)
             return;
         }
-        this.model.addNode(metaData)
+
+        this.model.addNode<T>(metaData)
     }
 }
 

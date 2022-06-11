@@ -12,10 +12,11 @@ export class Model {
         this.nodes = []
     }
 
-    addNode<T>(options:Model.addNodeMeta) {
+    addNode<T = unknown>(options:Model.addNodeMeta) {
         let shapeMap = getShapeMap();
+        let view = this.graph.getView();
         let Ctor = shapeMap[options.type]
-        let node = new Ctor(options);
+        let node = new Ctor({ ...options,view});
         this.nodes.push(node as T)
     }
 }

@@ -4,7 +4,6 @@ import { Event } from './event'
 import { Graph } from './graph';
 import * as d3 from 'd3';
 import _ from 'lodash'
-import { BasicNode } from './nodes/basic.node';
 
 
 export class View extends Event {
@@ -89,6 +88,10 @@ export class View extends Event {
 
     public getGroup() {
         return this.svg
+    }
+
+    public appendCompoent(g:SVGElement) {
+        this.svg.append(g)
     }
 }
 

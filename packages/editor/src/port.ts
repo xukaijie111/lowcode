@@ -18,4 +18,6 @@ export namespace Port {
         attrs:Record<any,any>
         data:unknown, //用户数据
     }
+
+    export type DIRECTION = "LEFT" | "TOP" | "RIGHT" | "DOWN"
 }
