@@ -3,20 +3,24 @@ import { View } from '../view';
 import * as d3 from 'd3'
 import { generateId, prefix } from '../util'
 import { Component } from "../graph";
+import {
+    Event
+} from '../event'
 
 
 export const defaultPortRule = (s:Component,t:Component,sPort:BasicNode.Port,tPort:BasicNode.Port) => s.getId() !== t.getId() && sPort.id !== tPort.id
 
 
-export abstract class BasicNode {
+export abstract class BasicNode extends Event{
     options: BasicNode.options
-    private g: SVGElement
+    g: SVGElement
     body: SVGElement
-    private id: string
+    id: string
     selected: boolean
     ports:Array<BasicNode.Port> & { ele?: SVGRectElement}
 
     constructor(options: BasicNode.options) {
+        super();
         this.options = options;
 
         if (!this.options.id) {
@@ -26,8 +30,8 @@ export abstract class BasicNode {
         this.ports = [];
         this.createGroup();
         this.createBody();
-        this.createPorts();
         this.append(this.body);
+        this.createPorts();
         this.initEvents();
 
     }
@@ -97,12 +101,12 @@ export abstract class BasicNode {
     onMouseDown(event:MouseEvent) {
         //@ts-ignore
         let id = event.target.dataset.id;
-        console.log(`mousedown is `,id)
-        if (id.indexOf('body')) {
+        if (id.indexOf('body') !== -1) {
             this.shapeSelected();
             this.setSelected(true);
             this.options.view.emit('cell:mousedown',{ cell:this,event})
-        }else if (id.indexOf('port')) {
+        }else if (id.indexOf('port') !== -1) {
+            console.log(`cell port down`)
             this.options.view.emit('cell:portdown',{ cell:this,event})
         }
     }
@@ -136,8 +140,7 @@ export abstract class BasicNode {
     }
 
     createPort(item:BasicNode.Port) {
-        console.log(`item is `,item);
-        let { width:p_width = 0 ,height:p_height = 0 ,id,attrs = {}} = item;
+        let { width:p_width = 0 ,height:p_height = 0 ,attrs = {},position} = item;
         let pt = this.getPortPosition(item) as [number,number]
         let port = document.createElementNS("http://www.w3.org/2000/svg",'rect')
         d3.select(port)
@@ -146,7 +149,7 @@ export abstract class BasicNode {
             .attr('x',pt[0])
             .attr('y',pt[1])
             .attr('class','mangodo-node-port')
-            .attr('data-id', `${prefix}-${this.id}-port-${id}`)
+            .attr('data-id', `${prefix}-${this.id}-port-${position}`)
             .attr('rx',attrs.r)
             .attr('ry',attrs.r)
         this.append(port);
@@ -180,6 +183,45 @@ export abstract class BasicNode {
             return [
                 -p_width/2,
                 (height - p_height)/2
+            ]
+        }
+    }
+
+    getPositionByEvent(event:MouseEvent) {
+        //@ts-ignore
+        let id = event.target.dataset.id;
+        let reg = new RegExp(`^${prefix}-${this.id}-port-(.+)$`)
+        let match = id.match(reg)
+        if (match) {
+
+        }
+    }
+
+    getLinePosition(item:BasicNode.Port) {
+        let { position,width = 0,height = 0 } = item;
+        let x = this.options.x;
+        let y = this.options.y;
+        let { width:n_width = 0,height:n_height = 0} = this.options;
+        if (position === BasicNode.PortPoistion.LEFT) {
+            return [
+                x - width/2,
+                y+n_height/2
+            ]
+        }else if (position === BasicNode.PortPoistion.UP) {
+            return  [
+                    x+n_width/2,
+                    y-height/2
+                ]
+            
+        }else if (position === BasicNode.PortPoistion.RIGHT) {
+            return [
+                x+n_width+width/2,
+                y+n_height/2
+            ]
+        }else if (position === BasicNode.PortPoistion.DOWN) {
+            return [
+                x+n_width/2,
+                y+n_height+height/2
             ]
         }
     }

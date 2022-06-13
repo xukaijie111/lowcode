@@ -6,7 +6,8 @@ import { defaultPortRule } from './basic.node'
 export class RectNode extends BasicNode {
 
     constructor(options: BasicNode.options) {
-        super(_.merge(RectNode.defaultOptions, options))
+        console.log(`rect node options is `,_.cloneDeep(options),_.merge({},RectNode.defaultOptions, options),RectNode.defaultOptions)
+        super(_.merge({},RectNode.defaultOptions, options))
     }
 
     public getShape() {
@@ -52,7 +53,7 @@ export namespace RectNode {
         },
         ports: {
             attrs:{
-                r:5
+                r:2
             },
             width:10,
             height:10,

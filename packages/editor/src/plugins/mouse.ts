@@ -53,14 +53,11 @@ export class MousePlugin {
         }
     }
 
-    startNodeMove = ({cell, event:prevEent}:ViewEventParam) => {
-        console.log(`###start move is `,cell,prevEent)
+    startNodeMove = ({cell, event:prevEvent}:ViewEventParam) => {
         d3.select(this.view.getGroup())
             .on('mousemove', (event) => {
-                this.handleCellMove(cell, prevEent, event)
-
-                prevEent = event;
-
+                this.handleCellMove(cell, prevEvent, event)
+                prevEvent = event;
             })
             .on('mouseup', (event) => {
                 d3.select(this.view.getGroup())
@@ -68,7 +65,18 @@ export class MousePlugin {
             })
     }
 
-    startDragLine = ({cell, event:prevEent}:ViewEventParam) => {
+    startDragLine = ({cell, event:startEvent}:ViewEventParam) => {
+        let startPosition = cell.getPositionByEvent(startEvent);
+        
+        d3.select(this.view.getGroup())
+        .on('mousemove', (event) => {
+           
+        })
+        .on('mouseup', (event) => {
+            d3.select(this.view.getGroup())
+                .on('mousemove', (event) => event.stopPropagation())
+        })
+
 
     }
 
@@ -91,6 +99,7 @@ export class MousePlugin {
         let { graph } = this;
         let view = graph.getView();
         let data = event.dataTransfer?.getData("data");
+        console.log(`ondrop data is `,data);
         //@ts-ignore
         let formatData = JSON.parse(data)
         if (graph.checkIsValidNodeType(formatData?.type)) {
