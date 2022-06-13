@@ -2,17 +2,21 @@
 import {
     BasicNode
 } from './nodes/basic.node'
+import {
+    Component
+} from './graph'
 import { getShapeMap} from './nodes/index'
 import { View } from './view'
 
 
 export class Model {
     view:View
-    nodes:Array<BasicNode>
+    nodes:Array<Component>
+    history:Array<Component>
     constructor(options:{view:View}) {
         this.view = options.view;
         this.nodes = []
-        this.initEvents();
+        this.history = [];
     }
 
     addNode(options:Model.addNodeMeta) {
@@ -21,10 +25,19 @@ export class Model {
         let Ctor = shapeMap[options.type]
         let node = new Ctor({ ...options,view});
         this.nodes.push(node)
+        this.appendtoView(node);
+    }
+
+    appendtoView(node:Component) {
+        this.view.getGroup().append(node.getGroup())
+    }
+
+    removeFromView(node:Component) {
+        node.remove();
+        node.getGroup().remove();
     }
 
     getCellById(id:string) {
-       id = id.split('-')[1];
 
         for (let i = 0; i < this.nodes.length;i++) {
             let node = this.nodes[i]
@@ -32,26 +45,21 @@ export class Model {
         }
     }
 
-    onMouseDown(cell:BasicNode) {
-        cell.onMouseDown();
-        cell.setSelected(true);
-    }
+    removeComponents(cells:Array<Component> | Component) {
+        if (Array.isArray(cells)) {
+            cells.forEach((cell) => {
+                this.removeComponents(cell)
+            })
+        }
+        let cell = cells as Component;
 
-
-    initEvents() {
-       for (let name in Model.events) {
-           //@ts-ignore
-           let handler = Model.events[name]
-           //@ts-ignore
-           this.view.on(name,this[handler])
-       }
-    }
-
-    onMouseDownBlankView = () => {
-        this.nodes.forEach((node) => {
-            node.onMouseUp();
-            node.setSelected(false);
-        })
+        //@ts-ignore
+        let index = _.findIndex(this.nodes, { id: cell.id})
+        if (index !== -1) {
+            let removed = this.nodes.splice(index,1)[0];
+            this.removeFromView(removed);
+            this.history.push(removed);
+        }
     }
 
   
@@ -60,10 +68,6 @@ export class Model {
 export namespace Model {
     export interface addNodeMeta extends Omit<BasicNode.options,'view'> {
         type:string
-    }
-
-    export const events = {
-        'blank:view':"onMouseDownBlankView"
     }
 
 }

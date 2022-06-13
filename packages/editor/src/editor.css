@@ -34,17 +34,17 @@
     font-weight: 100;;
 }
 
-.cahrt-node-port {
+.mangodo-node-port {
     stroke: #999;
     stroke-width: 1;
     fill: #d9d9d9;
     cursor: crosshair;
 }
-.cahrt-node-port:hover {
+.mangodo-node-port:hover {
     stroke-width: 2;
     stroke: #ff7f0e !important;
 }
-.cahrt-node-port-selected{
+.mangodo-node-port-selected{
     stroke-width: 2;
     stroke: #ff7f0e !important;
 }

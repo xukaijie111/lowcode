@@ -8,4 +8,5 @@ export function generateId(len = 10) {
     return s
 }
 
+
 export const prefix = `monado`
