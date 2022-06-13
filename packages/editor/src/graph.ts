@@ -14,13 +14,12 @@ import {
 export class Graph extends Event {
     private options: Graph.Options
     view: View
-    private model: Model
     constructor(options: Graph.Options) {
         super();
         this.options = options;
 
         this.view = new View({ graph: this, ...this.options })
-        this.model = new Model({ graph: this })
+
         this.installPlugins()
     }
 
@@ -42,19 +41,19 @@ export class Graph extends Event {
         return this.view
     }
 
+
     public checkIsValidNodeType(type: string) {
         let shape = getShapeMap();
         return Object.keys(shape).includes(type)
     }
 
-    public addNode<T = unknown>(metaData: Graph.GraphAddNodeMets) {
-        console.log(`###metadata is `,metaData);
+    public addNode(metaData: Graph.GraphAddNodeMets) {
         if (!this.checkIsValidNodeType(metaData.type)) {
             console.warn(`${metaData.type} node is not in manado/editor. you can use registerNode to register first!`)
             return;
         }
 
-        this.model.addNode<T>(metaData)
+        this.view.addNode(metaData)
     }
 }
 

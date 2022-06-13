@@ -24,8 +24,24 @@ export class MousePlugin {
 
     }
 
-    mouseDown = (event: MouseEvent) => {
 
+    mouseDown = (event: MouseEvent) => {
+        event.stopPropagation();
+       event.preventDefault();
+        if (event.button !== 0) return; //右键不处理
+        let target = event.target as EventTarget;
+        let view = this.graph.getView();
+        let model  = view.getModel();
+
+        if (view.isComponent(target)) {
+            //@ts-ignore
+                let cell = model.getCellById(target.dataset.id);
+
+                //@ts-ignore
+                model.onMouseDown(cell)
+        }else {
+            view.emit('blank:view', { event })
+        }
     }
 
     dragOver = (event: MouseEvent) => {

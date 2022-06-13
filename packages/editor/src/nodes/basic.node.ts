@@ -2,16 +2,24 @@ import _ from 'lodash'
 import { Port } from '../port'
 import { View } from '../view';
 import * as d3 from 'd3'
+import { generateId,prefix } from '../util'
+
 
 export abstract class BasicNode {
     options:BasicNode.options
     private g:SVGElement
-    private body:SVGElement
+    body:SVGElement
+    private id:string
+    selected:boolean
     constructor(options:BasicNode.options) {
-        console.log(`###this.options is `,options)
         this.options = options;
+
+        if (!this.options.id) {
+            this.options.id = generateId();
+        }
+        this.id = this.options.id;
         this.createGroup();
-        this.body = this.getShape();
+        this.createBody();
         this.append(this.body);
 
     }
@@ -20,11 +28,18 @@ export abstract class BasicNode {
         this.g.append(s)
     }
 
+    private createBody() {
+        this.body = this.getShape();
+        d3.select(this.body)
+        .attr('data-id',`${prefix}-${this.id}`)
+    }
+
     private createGroup() {
         let { x ,y } = this.options
         this.g = document.createElementNS("http://www.w3.org/2000/svg", 'g');
         d3.select(this.g)
         .attr('transform',`translate(${x},${y})`)
+       
 
         this.options.view.appendCompoent(this.g);
     }
@@ -43,20 +58,25 @@ export abstract class BasicNode {
         .attr('transform',`translate(${x},${y})`)
     }
 
+    public getId() { return this.id }
+
     abstract getShape():SVGElement;
 
+    abstract onMouseDown():unknown;
+    abstract onMouseUp():unknown;
 
 
+    public setSelected(val:unknown) {
+        this.selected = !!val
+    }
 
 }
 
 export namespace BasicNode {
 
-    export type PortItem  = {
-        id:string,
-        rule?:(source:Port,target:Port) => boolean | boolean; //是否可以连线的规则
-    }
+  
     export type options = {
+        id?:string,
         view:View,
         x:number,
         y:number,
@@ -68,7 +88,7 @@ export namespace BasicNode {
             attrs:Record<any,any> // svg text的属性
         },
         ports?: {
-            items: Array<PortItem>
+            items: Array<Port.options>
         },
         data?:unknown, // 用户数据
     }

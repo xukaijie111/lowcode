@@ -17,7 +17,6 @@ export class RectNode extends BasicNode {
         .attr('width',width)
         .attr('height',height)
     
-
         let { attrs = { }} = this.options;
         for (let key in attrs) {
             let value = attrs[key]
@@ -27,6 +26,16 @@ export class RectNode extends BasicNode {
         return body;
             
     }
+
+    public onMouseDown() {
+        d3.select(this.body)
+        .attr('class','mangodo-node-body-selected')
+    }
+
+    public onMouseUp() {
+        d3.select(this.body)
+        .attr('class','mangodo-node-body')
+    }
 }
 
 
@@ -34,5 +43,9 @@ export namespace RectNode {
     export const defaultOptions  = {
         width:80,
         height:30,
+        attrs:{
+            rx:2,
+            ry:2
+        }
     }
 }

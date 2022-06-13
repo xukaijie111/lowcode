@@ -16,7 +16,6 @@ export class Event {
     }
 
     emit(name:string,...param:any[]) {
-        console.log(`emit`,name)
         let list = this.events[name]
         if (!list) return this;
         list.forEach((handler) => {

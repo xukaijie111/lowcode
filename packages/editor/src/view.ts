@@ -4,15 +4,19 @@ import { Event } from './event'
 import { Graph } from './graph';
 import * as d3 from 'd3';
 import _ from 'lodash'
+import {  prefix } from './util'
+import { Model } from './model'
 
 
 export class View extends Event {
     private wrap:HTMLElement
     private svg: SVGElement
     private options: View.options
+    model:Model
     constructor(options: View.options) {
         super();
         this.options = _.merge(View.defaultOptions, options)
+        this.model = new Model({ view:this })
         this.wrap = this.createWrap();
         this.svg = this.createSvg();
         this.createGrid();
@@ -90,9 +94,28 @@ export class View extends Event {
         return this.svg
     }
 
+    getModel() {
+        return this.model;
+    }
+
     public appendCompoent(g:SVGElement) {
         this.svg.append(g)
     }
+
+    public isComponent(target:EventTarget) {
+        //@ts-ignore
+        let dataset = target.dataset;
+        let { id } = dataset;
+        let reg = new RegExp(`^${prefix}`)
+        return reg.test(id);
+    }
+
+    addNode(meta:Model.addNodeMeta) {
+        this.model.addNode(meta)
+    }
+
+
+
 }
 
 
