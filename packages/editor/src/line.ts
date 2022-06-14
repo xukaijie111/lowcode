@@ -8,6 +8,8 @@ export class Line extends Event {
 
 
     static generateLinkPath(origX:number, origY:number, destX:number, destY:number, sc:number) {
+        let RECT_WIDTH = 80;
+        let RECT_HEIGHT = 30;
         var dy = destY - origY;
         var dx = destX - origX;
         var delta = Math.sqrt(dy * dy + dx * dx);

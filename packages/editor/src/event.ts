@@ -41,6 +41,18 @@ export class Event {
 
         return this;
     }
+
+    once(
+        name: string,
+        handler:Event.Handler
+      ) {
+        const cb = (...args: any) => {
+          this.off(name, cb as any)
+          return handler(...args)
+        }
+    
+        return this.on(name, cb as any)
+      }
 }
 
 export namespace Event {

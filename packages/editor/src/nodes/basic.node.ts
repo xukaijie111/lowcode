@@ -106,8 +106,17 @@ export abstract class BasicNode extends Event{
             this.setSelected(true);
             this.options.view.emit('cell:mousedown',{ cell:this,event})
         }else if (id.indexOf('port') !== -1) {
-            console.log(`cell port down`)
             this.options.view.emit('cell:portdown',{ cell:this,event})
+        }
+    }
+
+    onMouseUp(event:MouseEvent) {
+         //@ts-ignore
+        let id = event.target.dataset.id;
+        if (id.indexOf('body') !== -1) {
+            this.options.view.emit('cell:bodyup',{ cell:this,event})
+        }else if (id.indexOf('port') !== -1) {
+            this.options.view.emit('cell:portup',{ cell:this,event})
         }
     }
 
@@ -192,13 +201,17 @@ export abstract class BasicNode extends Event{
         let id = event.target.dataset.id;
         let reg = new RegExp(`^${prefix}-${this.id}-port-(.+)$`)
         let match = id.match(reg)
+        console.log(`###id is `,id,reg,match)
         if (match) {
-
+            let ps = match[1];
+            return this.getLinePosition(ps) as [number,number]
         }
+        return [0,0]
     }
 
-    getLinePosition(item:BasicNode.Port) {
-        let { position,width = 0,height = 0 } = item;
+    getLinePosition(position:BasicNode.PortPoistion) {
+        let item = _.find(this.ports, { position }) as BasicNode.Port;
+        let { width = 0,height = 0 } = item;
         let x = this.options.x;
         let y = this.options.y;
         let { width:n_width = 0,height:n_height = 0} = this.options;
