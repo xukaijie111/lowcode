@@ -1,44 +1,46 @@
-
-
 <script lang="ts" setup>
+import { onMounted, ref } from 'vue';
+import { mGraph } from '../core/graph'
+import x6MainVue from '../components/x6-main.vue';
+import x6StencilVue from '../components/x6-stencil.vue';
 
- import { onMounted } from 'vue'
- import { Process } from '../core/process'
- import { MenuPlugin } from "../core/plugins/index"
-
-let process = new Process();
-
+let stencil = ref()
+let main =  ref() 
+let mgraph:mGraph
 onMounted(() => {
-process.createGraph({
-    ele:document.getElementById('container') as HTMLElement,
-    plugins:[
-        new MenuPlugin()
-    ]
-})
+    mgraph = new mGraph();
+    //console.log(`#####x6MainVue is `,main)
+    main.value.init(mgraph);
+    stencil.value.init(mgraph)
 })
 
 
 </script>
 
-<template>
-    <div class="graph-wrap">
-        <div class="container" id="container"></div>
-    </div>
 
+<template>
+    <div class="graph-container w-full h-full">
+        <div class="stencil h-full" >
+            <x6StencilVue ref="stencil"/>
+
+        </div>
+        <div class="graph-wrap">
+             <x6MainVue ref="main" />
+        </div>
+    </div>
 </template>
 
-
 <style lang="less" scoped>
-.graph-wrap {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
 
-    .container {
-        width:100%;
-        height:100%;
-        position: relative;
+    .graph-container {
+        display: flex;
+        .stencil {
+            width: 200px;
+            position: relative;
+        }
+        .graph-wrap {
+            width: 0px;
+            flex: 1;
+        }
     }
-}
 </style>

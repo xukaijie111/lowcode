@@ -5,7 +5,6 @@ import 'element-plus/dist/index.css'
 import router from './router'
 import './assets/css/main.css';
 import './assets/css/global.css';
-import "@manondo/editor/dist/editor.css"
 
 const app = createApp(App)
 
