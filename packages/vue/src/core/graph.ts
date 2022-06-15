@@ -1,22 +1,28 @@
-import { Graph, Shape, Addon } from '@antv/x6'
+import { Graph, Shape, Addon,Node ,Edge} from '@antv/x6'
+import { PortManager } from '@antv/x6/lib/model/port'
 import _ from 'lodash'
+import {
+    Event
+} from './event'
 
-export class mGraph {
+export class mGraph  extends Event{
     graph: Graph
     stencil: Addon.Stencil
     ports = mGraph.defaultPorts
+    container:HTMLElement
     constructor() {
-
+        super();
     }
 
     createGraph(options: Graph.Options) {
+        this.container = options.container as HTMLElement
         let _options = _.merge({}, mGraph.defaultGraphOptions, options);
         this.graph = new Graph(_options)
         return this.graph
     }
 
     createStencil(options: Partial<Addon.Stencil.Options>, ele: HTMLElement) {
-        let _options: Addon.Stencil.Options = _.merge({}, mGraph.defaultStencilOptions, options) as  Addon.Stencil.Options
+        let _options: Addon.Stencil.Options = _.merge({}, mGraph.defaultStencilOptions, options) as Addon.Stencil.Options
         _options.target = this.graph;
         this.stencil = new Addon.Stencil(_options)
         ele.appendChild(this.stencil.container)
@@ -25,7 +31,26 @@ export class mGraph {
 
     regitserNode() {
 
-        let ports = this.ports;
+        let { ports, graph ,container} = this;
+
+        // 控制连接桩显示/隐藏
+        const showPorts = (ports: NodeListOf<SVGElement>, show: boolean) => {
+            for (let i = 0, len = ports.length; i < len; i = i + 1) {
+                ports[i].style.visibility = show ? 'visible' : 'hidden'
+            }
+        }
+        graph.on('node:mouseenter', () => {
+            const ports = container.querySelectorAll(
+                '.x6-port-body',
+            ) as NodeListOf<SVGElement>
+            showPorts(ports, true)
+        })
+        graph.on('node:mouseleave', () => {
+            const ports = container.querySelectorAll(
+                '.x6-port-body',
+            ) as NodeListOf<SVGElement>
+            showPorts(ports, false)
+        })
 
         Graph.registerNode(
             'custom-rect',
@@ -44,7 +69,7 @@ export class mGraph {
                         fill: '#262626',
                     },
                 },
-                ports: { ...ports },
+                ports: _.cloneDeep(ports),
             },
             true,
         )
@@ -67,7 +92,7 @@ export class mGraph {
                     },
                 },
                 ports: {
-                    ...ports,
+                    ..._.cloneDeep(ports),
                     items: [
                         {
                             group: 'top',
@@ -98,7 +123,7 @@ export class mGraph {
                         fill: '#262626',
                     },
                 },
-                ports: { ...ports },
+                ports:_.cloneDeep(ports),
             },
             true,
         )
@@ -126,11 +151,11 @@ export class mGraph {
             shape: 'custom-rect',
             attrs: {
                 body: {
-                    rx: 6,
-                    ry: 6,
+                    rx: 20,
+                    ry: 20,
                 },
             },
-            label: '可选过程',
+            label: '结束',
         })
         const r4 = graph.createNode({
             shape: 'custom-polygon',
@@ -139,29 +164,32 @@ export class mGraph {
                     refPoints: '0,10 10,0 20,10 10,20',
                 },
             },
-            label: '决策',
+            label: '判断',
         })
-        const r5 = graph.createNode({
-            shape: 'custom-polygon',
-            attrs: {
-                body: {
-                    refPoints: '10,0 40,0 30,20 0,20',
-                },
-            },
-            label: '数据',
-        })
-        const r6 = graph.createNode({
-            shape: 'custom-circle',
-            label: '连接',
-        })
-        stencil.load([r1, r2, r3, r4, r5, r6], 'group1')
+        stencil.load([r1, r2, r3, r4], 'group1')
     }
 
+    on(name:any,handler:Event.Handler) {
+        let { graph } = this
+        graph.on(name,(...param:any[])=> {
+            super.emit(name,...param)
+        })
+        super.on(name,handler);
+        return this;
+    }
 
 }
 
 
 export namespace mGraph {
+
+    export interface PortMeta extends PortManager.PortMetadata {
+        data:{
+            allowMult:boolean,
+            link:"in"|"out"
+        }
+    }
+
     export const defaultGraphOptions: Graph.Options = {
         grid: true,
         mousewheel: {
@@ -187,6 +215,8 @@ export namespace mGraph {
             anchor: 'center',
             connectionPoint: 'anchor',
             allowBlank: false,
+            allowLoop:false,
+            allowNode:false,
             snap: {
                 radius: 20,
             },
@@ -206,8 +236,44 @@ export namespace mGraph {
                     zIndex: 0,
                 })
             },
-            validateConnection({ targetMagnet }) {
-                return !!targetMagnet
+            validateConnection({ sourceCell,targetCell,sourcePort,targetPort,sourceView}) {
+
+                let graph = sourceView?.graph
+           
+                let edges = graph?.getEdges() as Edge<Edge.Properties>[];
+                // 当前这条连线先不算在内
+                edges?.pop();
+                let sourceNode = sourceCell as Node
+                let targetNode = targetCell as Node;
+                let sourcePorts = sourceNode.getPorts();
+                let targetPorts = targetNode.getPorts();
+               
+
+                let sPort = _.find(sourcePorts,{ id:sourcePort}) as PortMeta
+                let tPort = _.find(targetPorts, { id:targetPort}) as PortMeta
+
+                if (sPort.data.link === tPort.data.link) return false;
+
+                for (let i = 0 ; i < edges?.length;i++) {
+                    let edge = edges[i];
+                    //@ts-ignore
+                    let {port:edgeSourcePortId,cell:edgeSourceCellId } = edge.getTerminal('source');
+                    //@ts-ignore
+                    let { port:edgeTargetPortId,cell:edgeTaregtCellId }  = edge.getTerminal('target');
+
+                  
+                    
+                    // portId竟然相等
+                    // 同一个node 下的同一个portid
+    
+                    if (edgeSourceCellId === sourceCell?.id && edgeSourcePortId === sPort.id && !sPort.data.allowMult) return false;
+                    if (edgeTaregtCellId === targetCell?.id && edgeTargetPortId === tPort.id && !tPort.data.allowMult) return false;
+                    
+                }
+                
+              
+                
+                return true
             },
         },
         highlighting: {
@@ -316,16 +382,21 @@ export namespace mGraph {
             },
         },
         items: [
+            
             {
-                group: 'top',
-            },
-            {
+                data:{
+                    allowMult:false,
+                    link:"out"
+                },
                 group: 'right',
             },
+           
             {
-                group: 'bottom',
-            },
-            {
+                data:{
+                    allowMult:false,
+                    link:"in"
+                },
+              
                 group: 'left',
             },
         ],
