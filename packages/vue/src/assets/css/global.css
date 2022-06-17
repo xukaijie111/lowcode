@@ -241,3 +241,14 @@
     left: 0px;
     top: 0px;
   }
+
+
+.ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis
+}
+
+.noselect{
+  user-select: none;
+}

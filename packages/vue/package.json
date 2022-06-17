@@ -14,8 +14,8 @@
     "element-plus": "^2.2.4",
     "less": "^4.1.2",
     "vue": "^3.2.25",
-    "vue-router": "^4.0.15",
-    "@manondo/editor":"1.0.0"
+    "vue-codemirror": "^6.0.0",
+    "vue-router": "^4.0.15"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.3",

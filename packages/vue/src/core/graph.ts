@@ -1,24 +1,58 @@
-import { Graph, Shape, Addon,Node ,Edge} from '@antv/x6'
+import { Graph, Shape, Addon, Node, Edge } from '@antv/x6'
 import { PortManager } from '@antv/x6/lib/model/port'
 import _ from 'lodash'
 import {
     Event
 } from './event'
 
-export class mGraph  extends Event{
-    graph: Graph
+export class mGraph extends Event {
+   private graph: Graph
     stencil: Addon.Stencil
     ports = mGraph.defaultPorts
-    container:HTMLElement
+    container: HTMLElement
     constructor() {
         super();
+    }
+
+    public getGraph() {
+        return this.graph
     }
 
     createGraph(options: Graph.Options) {
         this.container = options.container as HTMLElement
         let _options = _.merge({}, mGraph.defaultGraphOptions, options);
         this.graph = new Graph(_options)
+        this.initDefaultKeyEvents()
         return this.graph
+    }
+
+    initDefaultKeyEvents() {
+        let { graph } = this;
+        //delete
+        graph.bindKey('backspace', () => {
+            const cells = graph.getSelectedCells()
+            if (cells.length) {
+                graph.removeCells(cells)
+            }
+        })
+
+        //undo redo
+        graph.bindKey(['command+z', 'ctrl+z'], () => {
+            console.log(`###canundo is `,graph.history.canUndo())
+            if (graph.history.canUndo()) {
+                graph.history.undo()
+            }
+            return false
+        })
+
+        // select all
+        graph.bindKey(['meta+a', 'ctrl+a'], () => {
+            const nodes = graph.getNodes()
+            if (nodes) {
+                graph.select(nodes)
+            }
+        })
+
     }
 
     createStencil(options: Partial<Addon.Stencil.Options>, ele: HTMLElement) {
@@ -31,7 +65,7 @@ export class mGraph  extends Event{
 
     regitserNode() {
 
-        let { ports, graph ,container} = this;
+        let { ports, graph, container } = this;
 
         // 控制连接桩显示/隐藏
         const showPorts = (ports: NodeListOf<SVGElement>, show: boolean) => {
@@ -78,6 +112,7 @@ export class mGraph  extends Event{
             'custom-polygon',
             {
                 inherit: 'polygon',
+
                 width: 66,
                 height: 36,
                 attrs: {
@@ -95,38 +130,34 @@ export class mGraph  extends Event{
                     ..._.cloneDeep(ports),
                     items: [
                         {
+                            data: {
+                                allowMult: false,
+                                link: "in"
+                            },
                             group: 'top',
                         },
                         {
+                            data: {
+                                allowMult: false,
+                                link: "out",
+                                type: "check"
+                            },
                             group: 'bottom',
                         },
+                        {
+                            data: {
+                                type: "check",
+                                allowMult: false,
+                                link: "out"
+                            },
+                            group: "right"
+                        }
                     ],
                 },
             },
             true,
         )
 
-        Graph.registerNode(
-            'custom-circle',
-            {
-                inherit: 'circle',
-                width: 45,
-                height: 45,
-                attrs: {
-                    body: {
-                        strokeWidth: 1,
-                        stroke: '#5F95FF',
-                        fill: '#EFF4FF',
-                    },
-                    text: {
-                        fontSize: 12,
-                        fill: '#262626',
-                    },
-                },
-                ports:_.cloneDeep(ports),
-            },
-            true,
-        )
 
     }
 
@@ -142,10 +173,18 @@ export class mGraph  extends Event{
                     ry: 26,
                 },
             },
+            data: {
+                ..._.cloneDeep(mGraph.defaultNodeData),
+                type: "start"
+            }
+
         })
         const r2 = graph.createNode({
             shape: 'custom-rect',
             label: '过程',
+            data: {
+                ..._.cloneDeep(mGraph.defaultNodeData),
+            }
         })
         const r3 = graph.createNode({
             shape: 'custom-rect',
@@ -156,6 +195,10 @@ export class mGraph  extends Event{
                 },
             },
             label: '结束',
+            data: {
+                ..._.cloneDeep(mGraph.defaultNodeData),
+                type: "end"
+            }
         })
         const r4 = graph.createNode({
             shape: 'custom-polygon',
@@ -165,16 +208,20 @@ export class mGraph  extends Event{
                 },
             },
             label: '判断',
+            data: {
+                ..._.cloneDeep(mGraph.defaultNodeData),
+                type: "check"
+            }
         })
         stencil.load([r1, r2, r3, r4], 'group1')
     }
 
-    on(name:any,handler:Event.Handler) {
+    on(name: any, handler: Event.Handler) {
         let { graph } = this
-        graph.on(name,(...param:any[])=> {
-            super.emit(name,...param)
+        graph.on(name, (...param: any[]) => {
+            super.emit(name, ...param)
         })
-        super.on(name,handler);
+        super.on(name, handler);
         return this;
     }
 
@@ -184,9 +231,10 @@ export class mGraph  extends Event{
 export namespace mGraph {
 
     export interface PortMeta extends PortManager.PortMetadata {
-        data:{
-            allowMult:boolean,
-            link:"in"|"out"
+        data: {
+            allowMult: boolean,
+            link: "in" | "out",
+            type: string
         }
     }
 
@@ -215,8 +263,8 @@ export namespace mGraph {
             anchor: 'center',
             connectionPoint: 'anchor',
             allowBlank: false,
-            allowLoop:false,
-            allowNode:false,
+            allowLoop: false,
+            allowNode: false,
             snap: {
                 radius: 20,
             },
@@ -236,10 +284,10 @@ export namespace mGraph {
                     zIndex: 0,
                 })
             },
-            validateConnection({ sourceCell,targetCell,sourcePort,targetPort,sourceView}) {
+            validateConnection({ sourceCell, targetCell, sourcePort, targetPort, sourceView }) {
 
                 let graph = sourceView?.graph
-           
+
                 let edges = graph?.getEdges() as Edge<Edge.Properties>[];
                 // 当前这条连线先不算在内
                 edges?.pop();
@@ -247,32 +295,37 @@ export namespace mGraph {
                 let targetNode = targetCell as Node;
                 let sourcePorts = sourceNode.getPorts();
                 let targetPorts = targetNode.getPorts();
-               
 
-                let sPort = _.find(sourcePorts,{ id:sourcePort}) as PortMeta
-                let tPort = _.find(targetPorts, { id:targetPort}) as PortMeta
+
+                let sPort = _.find(sourcePorts, { id: sourcePort }) as PortMeta
+                let tPort = _.find(targetPorts, { id: targetPort }) as PortMeta
 
                 if (sPort.data.link === tPort.data.link) return false;
 
-                for (let i = 0 ; i < edges?.length;i++) {
+                for (let i = 0; i < edges?.length; i++) {
                     let edge = edges[i];
                     //@ts-ignore
-                    let {port:edgeSourcePortId,cell:edgeSourceCellId } = edge.getTerminal('source');
+                    let { port: edgeSourcePortId, cell: edgeSourceCellId } = edge.getTerminal('source');
                     //@ts-ignore
-                    let { port:edgeTargetPortId,cell:edgeTaregtCellId }  = edge.getTerminal('target');
+                    let { port: edgeTargetPortId, cell: edgeTaregtCellId } = edge.getTerminal('target');
 
-                  
-                    
+
+
                     // portId竟然相等
                     // 同一个node 下的同一个portid
-    
+
                     if (edgeSourceCellId === sourceCell?.id && edgeSourcePortId === sPort.id && !sPort.data.allowMult) return false;
                     if (edgeTaregtCellId === targetCell?.id && edgeTargetPortId === tPort.id && !tPort.data.allowMult) return false;
-                    
+
+
+                    // 允许多练的只有if/else 分支的输出连接到输入
+                    if (sPort.data.allowMult && tPort.data.type !== "check") return false
+                    if (tPort.data.allowMult && sPort.data.type !== "check") return false
+
                 }
-                
-              
-                
+
+
+
                 return true
             },
         },
@@ -295,9 +348,19 @@ export namespace mGraph {
             showNodeSelectionBox: true,
         },
         snapline: true,
-        keyboard: true,
         clipboard: true,
         scroller: true,
+        keyboard: {
+            enabled: true,
+            format(key) { 
+              return key
+              .replace(/\s/g, '')
+              .replace('cmd', 'command')
+            },
+        },
+        history:{
+            enabled:true
+        }
     }
 
     export const defaultStencilOptions = {
@@ -382,26 +445,38 @@ export namespace mGraph {
             },
         },
         items: [
-            
+
             {
-                data:{
-                    allowMult:false,
-                    link:"out"
+                data: {
+                    allowMult: false,
+                    link: "out"
                 },
                 group: 'right',
             },
-           
+
             {
-                data:{
-                    allowMult:false,
-                    link:"in"
+                data: {
+                    allowMult: true,
+                    link: "in"
                 },
-              
+
                 group: 'left',
             },
         ],
     }
 
 
+    export const defaultNodeData = {
+        base: {
+
+        },
+        code: {
+            source: ""
+        },
+        detail: {
+
+        },
+        type: "common"
+    }
 
 }
