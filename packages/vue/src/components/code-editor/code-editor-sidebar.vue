@@ -1,12 +1,13 @@
 
 <script lang="ts" setup>
-import { defineExpose,ref } from 'vue';
+import { ref } from 'vue';
 import type {Node} from '@antv/x6'
-import { mGraph } from '../core/graph';
+import { mGraph } from '../../core/graph';
 
     let props = defineProps<
         {
-            mgraph:mGraph
+            mgraph:mGraph,
+            activeNodeId:string
         }
     >()
 
@@ -47,7 +48,7 @@ defineExpose({
      <div 
 
      @click="onClickitem(index)"
-     
+     :class="props.activeNodeId === item.id ? 'active-item' : ''"
      v-for="(item,index) in listNodes" class="item w-full ellipsis">{{getNodeName(item as Node)}}</div>
    
   </div>
@@ -60,6 +61,10 @@ defineExpose({
             height: 100%;
             padding: 20px 0px;
             box-sizing: border-box;
+
+            .active-item{
+                 background-color:  #1e1e1e;
+            }
             .item {
                 color: white;
                 padding-left: 10px;

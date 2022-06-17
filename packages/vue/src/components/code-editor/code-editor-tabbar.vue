@@ -2,17 +2,18 @@
 
 import { ref } from 'vue';
 import type { Node } from '@antv/x6'
-import { mGraph } from '../core/graph';
+import { mGraph } from '../../core/graph';
+import { Close } from '@element-plus/icons-vue'
 import _ from 'lodash';
 
-defineProps<
+let props = defineProps<
   {
     mgraph: mGraph
+    activeNodeId:string
   }
 >()
 
 let opendNodes = ref<Array<Node>>([]);
-let activeNodeId = ref();
 
 const handleCurrentTab = (node: Node) => {
 
@@ -22,7 +23,6 @@ const addNode = (node: Node) => {
   if (!_.find(opendNodes.value, { id: node.id })) {
     opendNodes.value.push(node);
   }
-  activeNodeId.value = node.id;
 }
 
 const getNodeName = (node: Node) => {
@@ -42,10 +42,10 @@ defineExpose({
   <div id="editorTabBar" class="noselect">
     <div class="tab-list " ref="tabList">
       <div v-for="(item, index) in opendNodes" :key="index" class="editor-tab  flex-center"
-        :class="activeNodeId === item.id ? 'active-tab' : ''" @click="handleCurrentTab(item as Node)">
+        :class="props.activeNodeId === item.id ? 'active-tab' : ''" @click="handleCurrentTab(item as Node)">
         {{ getNodeName(item as Node) }}
 
-        <el-icon class="close-icon"></el-icon>
+        <el-icon class="close-icon" color="white" size="10"><Close /></el-icon>
       </div>
     </div>
   </div>
@@ -98,19 +98,18 @@ defineExpose({
       cursor: pointer;
 
       .close-icon {
-        
+        right: 0px;
+        top: 0px;
+        position: absolute;
+        top: 50%;
+        right: 4px;
+        transform: translateY(-50%);
+        border: 10px;
+        background-color: #333333;
+        opacity: 0;
+         transition: all 0.3s ease;
       }
 
-      i {
-        margin-right: 5px;
-        font-size: 18px;
-      }
-
-      svg {
-        margin-right: 5px;
-        width: 18px;
-        height: 18px;
-      }
 
       &:not(:first-child) {
         border-left: 1px solid #1a1a1a;
@@ -118,6 +117,9 @@ defineExpose({
 
       &:hover {
         color: #f2f2f2;
+        .close-icon{
+          opacity: 1;
+        }
       }
     }
 

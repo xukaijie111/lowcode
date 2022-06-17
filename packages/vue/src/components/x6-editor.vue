@@ -4,7 +4,7 @@
 import { defineExpose, ref } from 'vue'
 import { mGraph } from '../core/graph';
 import { Node, NodeView } from '@antv/x6'
-import codeEditorVue from './code-editor.vue';
+import codeEditorVue from './code-editor/index.vue';
 
 import type { TabsPaneContext } from 'element-plus'
 import { ElMessage } from 'element-plus'
@@ -46,13 +46,20 @@ const nodeValidCheck = async () => {
 
     }catch(err) {
         ElMessage.warning(`基本信息內容有误`)
-        return false;
+        return Promise.reject();
     }
    
 }
 
 const onConfirmClick = async () => {
-      nodeValidCheck();
+    try {
+        await nodeValidCheck();
+        currentNode.value?.setData(_.cloneDeep(nodeData.value))
+        ElMessage.success(`保存成功`)
+    } catch (error) {
+        
+    }
+
 }
 
 const open = (param: Param) => {
