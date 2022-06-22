@@ -6,10 +6,11 @@ import {
 } from './event'
 
 export class mGraph extends Event {
-   private graph: Graph
+    private graph: Graph
     stencil: Addon.Stencil
     ports = mGraph.defaultPorts
     container: HTMLElement
+    data:Record<AnalyserNode,any>
     constructor() {
         super();
     }
@@ -18,11 +19,17 @@ export class mGraph extends Event {
         return this.graph
     }
 
-    createGraph(options: Graph.Options) {
+    getName() {
+       return this.data.name;
+    }
+
+
+    createGraph(options: Graph.Options,data?:Record<AnalyserNode,any>) {
         this.container = options.container as HTMLElement
         let _options = _.merge({}, mGraph.defaultGraphOptions, options);
         this.graph = new Graph(_options)
         this.initDefaultKeyEvents()
+        this.data = data;
         return this.graph
     }
 

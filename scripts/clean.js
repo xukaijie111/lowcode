@@ -12,5 +12,6 @@ try{
         rm(path.resolve(__dirname,`../packages/${target}/node_modules`),()=>{})
     })
 }catch(err) {
+    console.log(err)
     process.exit()
 }

@@ -17,9 +17,7 @@
 
 <template>
 
-<div class="main-wrap ww-full h-full" id="graph">
-  
-</div>
+<div class="main-wrap ww-full h-full" id="graph"></div>
 
 </template>
 

@@ -1,7 +1,7 @@
 
 <script lang="ts" setup>
 
-import { defineExpose, ref } from 'vue'
+import { ref } from 'vue'
 import { mGraph } from '../core/graph';
 import { Node, NodeView } from '@antv/x6'
 import codeEditorVue from './code-editor/index.vue';
@@ -70,7 +70,7 @@ const open = (param: Param) => {
 }
 
 const onEditCodeClick = () => {
-    codeEditorRef.value.openEditor();
+    codeEditorRef.value.openEditor(currentNode.value);
 }
 
 defineExpose({

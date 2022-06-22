@@ -25,13 +25,22 @@ const addNode = (node: Node) => {
   }
 }
 
+const update = () => {
+  let nodes = props.mgraph.getGraph().getNodes();
+  let ids = nodes.map((n) => n.id)
+  opendNodes.value = _.filter(opendNodes.value,(node) => {
+      return ids.includes(node.id);
+  })
+}
+
 const getNodeName = (node: Node) => {
   let data = node.getData();
   return data.base.name || "未命名"
 }
 
 defineExpose({
-  addNode
+  addNode,
+  update
 })
 
 

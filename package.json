@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "preinstall": "node ./scripts/preinstall.js",
-    "postinstall": "npm --prefix ./server install",
+    "postinstall": "cnpm --prefix ./server install",
     "dev:vue": "npm --prefix ./packages/vue run dev",
     "dev:server": "npm --prefix ./server run start",
     "dev:editor":"node ./scripts/dev editor",

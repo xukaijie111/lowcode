@@ -13,10 +13,7 @@ defineExpose({
 </script>
 
 <template>
-    <div class="stencil-wrap w-full h-full" id="stencil">
-
-
-    </div>
+    <div class="stencil-wrap w-full h-full" id="stencil"></div>
 </template>
 
 <style lang="less" scoped>
