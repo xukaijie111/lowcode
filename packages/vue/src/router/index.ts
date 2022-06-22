@@ -1,25 +1,25 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-
+import Home from '../views/Home.vue';
 
 const routes = [
     {
         path:"/",
-        redirect:"/graph"
+        redirect:"/process"
     },
 
-    // {
-    //     path: "/",
-    //     name: "Home",
-    //     component: Home,
-    //     children: [
-    //         {
-    //             path: "/user_role",
-    //             name: "userRole",
-
-    //             component: () => import( /* webpackChunkName: "dashboard" */ "../views/RoleManage.vue")
-    //         },
-    //     ]
-    // },
+    {
+        path: "/",
+        name: "Home",
+        component: Home,
+        children: [
+            {
+                path:"/process",
+                name:"Process",
+                component: () => import( /* webpackChunkName: "login" */ "../views/Process.vue")
+            },
+        ]
+    },
+  
     {
         path:"/graph/:id?",
         name:"Graph",
