@@ -49,6 +49,9 @@
   .align-right{
     text-align: right;
   }
+  .align-left{
+    text-align: left;
+  }
   
   .bg-white{
     background-color: #fff;

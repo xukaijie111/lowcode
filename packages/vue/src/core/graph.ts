@@ -10,7 +10,7 @@ export class mGraph extends Event {
     stencil: Addon.Stencil
     ports = mGraph.defaultPorts
     container: HTMLElement
-    data:Record<AnalyserNode,any>
+    data:Record<any,any>
     constructor() {
         super();
     }
@@ -24,12 +24,12 @@ export class mGraph extends Event {
     }
 
 
-    createGraph(options: Graph.Options,data?:Record<AnalyserNode,any>) {
+    createGraph(options: Graph.Options,data?:Record<any,any>) {
         this.container = options.container as HTMLElement
         let _options = _.merge({}, mGraph.defaultGraphOptions, options);
         this.graph = new Graph(_options)
         this.initDefaultKeyEvents()
-        this.data = data;
+        this.data = data || {};
         return this.graph
     }
 

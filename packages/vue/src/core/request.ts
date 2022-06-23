@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosPromise, AxiosRequestConfig, AxiosRequestHeaders } from "axios"
+import axios, { AxiosInstance, AxiosPromise, AxiosRequestConfig,AxiosRequestHeaders } from "axios"
 
 import { ElMessage, ElLoading } from "element-plus";
 import { LoadingInstance } from "element-plus/lib/components/loading/src/loading"
@@ -6,9 +6,9 @@ import { LoadingInstance } from "element-plus/lib/components/loading/src/loading
 
 let loadingInstance: LoadingInstance | undefined
 
-function showLoading() {
+function showLoading(text = '') {
     if (!loadingInstance) {
-        loadingInstance = ElLoading.service({ fullscreen: true, background: 'rgba(0,0,0,0.2)' })
+        loadingInstance = ElLoading.service({ fullscreen: true, background: 'rgba(0,0,0,0.2)' ,text})
     }
 }
 
@@ -45,7 +45,8 @@ export class Request {
 
         this.instance.interceptors.request.use(
             (config: Request.IAxiosReuqetConfig) => {
-                if (config?.options?.loadingContent) showLoading();
+                let content = config?.options?.loadingContent
+                showLoading(content);
                 return config;
             },
             error => {
