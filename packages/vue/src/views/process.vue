@@ -44,7 +44,7 @@ let search = ref({
             title: "名称/描述",
             key: 'name',
             value: "",
-            placeholder: "请输入名称或者描述查询"
+            placeholder: "请输入名称查询"
         }
     ]
 })
@@ -53,7 +53,7 @@ let search = ref({
 let table = ref({
     index: true,
     multSelect: true,
-    operates: {
+    operate: {
         'delete': true
     },
     list: [

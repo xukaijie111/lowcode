@@ -30,7 +30,7 @@ type TableItem = {
 }
 
 type Operate = {
-    delete?: Function,
+    delete?: boolean,
     detail?: Function
 }
 

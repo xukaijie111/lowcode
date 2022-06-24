@@ -2,7 +2,7 @@
 
 <script lang="ts" setup>
 
-    import { ref } from 'vue';
+    import { ref, watch } from 'vue';
     import { ElMessage } from 'element-plus'
     import _ from 'lodash'
     
@@ -49,6 +49,13 @@
         if (!await checkValid()) return false;
         emit('confirm',data.value);
     }
+
+    watch(
+        () => props.data,
+        (newValue) => {
+            data.value = _.cloneDeep(newValue);
+        }
+    )
 
 </script>
 

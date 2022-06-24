@@ -7,7 +7,9 @@ import x6EditorVue from '../components/x6-editor.vue';
 import x6GraphInfoVue from '../components/x6-graph-info.vue'
 import _ from 'lodash'
 import { useRoute } from 'vue-router'
-import { createProcess } from '../common/api'
+import { createProcess , getProcessDetail , saveDsl } from '../common/api'
+import { ElMessage } from 'element-plus';
+
 
 
 const route = useRoute();
@@ -27,7 +29,7 @@ let id = ref();
 const createGraph = async (options = {}) => {
     mgraph.value = new mGraph();
     await nextTick();
-    main.value.init(mgraph.value, data.value, options);
+    main.value.init(mgraph.value, options);
     stencil.value.init(mgraph.value);
 
     (mgraph.value as mGraph).on("node:dblclick", (param) => {
@@ -50,11 +52,16 @@ const onConfirmDialog = async (_data) => {
 }
 
 const create = async () => {
-    let _id = await createProcess(data.value);
+    let _id = await createProcess({basic:data.value});
     id.value = _id;
 }
 
-const _getProcessDetail = () => {
+const _getProcessDetail = async () => {
+        let res = await getProcessDetail(id.value);
+        //@ts-ignore
+        let { basic ,config} = res;
+        data.value = basic;
+        mgraph.value?.fromJSON(config);
 
 }
 
@@ -70,9 +77,8 @@ const init = async () => {
         id.value = params.id;
         loading.value = false;
         await nextTick();
-
         createGraph();
-
+        await _getProcessDetail();
     } else {
         showModal.value = true;
     }
@@ -82,6 +88,24 @@ onMounted(() => {
     init();
 })
 
+
+const onSaveDsl = async () => {
+   let body = {
+        basic: {
+            ...data.value
+        },
+        config:mgraph.value?.toJson()
+   }
+
+   await saveDsl(id.value,body)
+
+    ElMessage.success(`保存成功`)
+
+}
+
+const onDeployDsl = () => {
+
+}
 
 
 
@@ -111,6 +135,10 @@ onMounted(() => {
 
                 </div>
                 <div class="graph-wrap">
+                    <div class="graph-operates">
+                         <el-button type="primary" @click="onSaveDsl">保存</el-button>
+                        <el-button type="primary" @click="onDeployDsl">部署</el-button>
+                    </div>
                     <x6MainVue ref="main" />
                 </div>
             </div>
@@ -144,6 +172,7 @@ onMounted(() => {
         height: 0px;
         display: flex;
         flex: 1;
+
     }
 
     .stencil {
@@ -154,6 +183,14 @@ onMounted(() => {
     .graph-wrap {
         width: 0px;
         flex: 1;
+        position: relative;
+
+        .graph-operates{
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            z-index: 10;
+        }
     }
 }
 </style>

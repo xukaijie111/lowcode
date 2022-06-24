@@ -10,7 +10,7 @@ export class mGraph extends Event {
     stencil: Addon.Stencil
     ports = mGraph.defaultPorts
     container: HTMLElement
-    data:Record<any,any>
+  
     constructor() {
         super();
     }
@@ -19,8 +19,12 @@ export class mGraph extends Event {
         return this.graph
     }
 
-    getName() {
-       return this.data.name;
+    fromJSON(config) {
+        return this.graph.fromJSON(config);
+    }
+
+    toJson() {
+        return this.graph.toJSON();
     }
 
 
@@ -29,9 +33,8 @@ export class mGraph extends Event {
             this.container = options.container as HTMLElement
             let _options = _.merge({}, mGraph.defaultGraphOptions, options);
             this.graph = new Graph(_options)
-            console.log(`###graph is `,this.graph);
+
             this.initDefaultKeyEvents()
-            this.data = data || {};
             return this.graph
         }catch(err) {
             console.log(err);
@@ -491,5 +494,7 @@ export namespace mGraph {
         },
         type: "common"
     }
+
+  
 
 }

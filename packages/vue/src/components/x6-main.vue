@@ -3,11 +3,11 @@
     import { mGraph } from '../core/graph'
 
  
-     const init = (mgraph:mGraph,data,options) => {
+     const init = (mgraph:mGraph,options) => {
         mgraph.createGraph({
             ...options,
             container:document.getElementById('graph') as HTMLElement
-        },data);
+        });
     }
 
     defineExpose({

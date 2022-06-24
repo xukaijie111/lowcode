@@ -29,11 +29,13 @@ export const getProcessList = (data) => {
 }
 
 
-export const createProcess = (data) => {
+export const createProcess = (config) => {
     return apiRequest({
         url:'/process/edit',
         method:'POST',
-        data
+        data:{
+            ...config
+        }
       }) 
 }
 
@@ -42,5 +44,25 @@ export const deleteProcess = (ids) => {
         url:'/process/delete',
         method:'POST',
         data: { ids }
+      }) 
+}
+
+export const getProcessDetail = (id) => {
+    return apiRequest({
+        url:'/process/detail',
+        method:'POST',
+        data: { id }
+      }) 
+}
+
+
+export const saveDsl = (id,config) => {
+    return apiRequest({
+        url:'/process/edit',
+        method:'POST',
+        data : {
+            id,
+            ...config,
+        }
       }) 
 }
