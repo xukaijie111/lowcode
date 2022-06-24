@@ -25,12 +25,18 @@ export class mGraph extends Event {
 
 
     createGraph(options: Graph.Options,data?:Record<any,any>) {
-        this.container = options.container as HTMLElement
-        let _options = _.merge({}, mGraph.defaultGraphOptions, options);
-        this.graph = new Graph(_options)
-        this.initDefaultKeyEvents()
-        this.data = data || {};
-        return this.graph
+        try{
+            this.container = options.container as HTMLElement
+            let _options = _.merge({}, mGraph.defaultGraphOptions, options);
+            this.graph = new Graph(_options)
+            console.log(`###graph is `,this.graph);
+            this.initDefaultKeyEvents()
+            this.data = data || {};
+            return this.graph
+        }catch(err) {
+            console.log(err);
+        }
+       
     }
 
     initDefaultKeyEvents() {

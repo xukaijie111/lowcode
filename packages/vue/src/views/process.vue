@@ -2,13 +2,15 @@
 
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import BaseVue from '../components/base.vue'
 import { useRouter } from 'vue-router'
 
-import { getProcessList } from '../common/api'
+import { getProcessList, deleteProcess } from '../common/api'
 
 const router = useRouter();
+
+const baseRef = ref();
 
 let searchConfirm = async (query, page) => {
     let body = {
@@ -21,13 +23,22 @@ let searchConfirm = async (query, page) => {
 }
 
 const create = () => {
-    console.log(`###create`)
-    router.push('/graph' )
+    router.push('/graph')
 }
+
+
+
+const deleteItems = async (rows: Array<unknown>) => {
+    //@ts-ignore
+    let ids = rows.map((r) => r.id)
+    await deleteProcess(ids);
+}
+
 
 let search = ref({
     confirm: searchConfirm,
     create,
+    delete: deleteItems,
     items: [
         {
             title: "名称/描述",
@@ -38,8 +49,13 @@ let search = ref({
     ]
 })
 
+
 let table = ref({
     index: true,
+    multSelect: true,
+    operates: {
+        'delete': true
+    },
     list: [
         {
             title: "名称",
@@ -48,12 +64,12 @@ let table = ref({
         {
             title: "描述",
             key: "description"
-        },
-        {
-            title: "操作",
-            template: "operate"
         }
     ]
+})
+
+onMounted(() => {
+    baseRef.value.onSubmitClick();
 })
 
 
@@ -63,16 +79,7 @@ let table = ref({
 
     <div class="process-wrap h-full">
 
-        <BaseVue :search="search" :table="table">
-
-            <div slot="operate">
-                123
-            </div>
-
-        </BaseVue>
-
-
-
+        <BaseVue :search="search" :table="table" ref="baseRef"></BaseVue>
     </div>
 
 </template>

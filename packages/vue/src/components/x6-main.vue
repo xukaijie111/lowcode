@@ -3,8 +3,9 @@
     import { mGraph } from '../core/graph'
 
  
-     const init = (mgraph:mGraph,data) => {
+     const init = (mgraph:mGraph,data,options) => {
         mgraph.createGraph({
+            ...options,
             container:document.getElementById('graph') as HTMLElement
         },data);
     }

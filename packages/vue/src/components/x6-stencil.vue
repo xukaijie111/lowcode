@@ -17,4 +17,9 @@ defineExpose({
 </template>
 
 <style lang="less" scoped>
+
+.stencil-wrap {
+    padding: 5px;
+    box-sizing: border-box;
+}
 </style>

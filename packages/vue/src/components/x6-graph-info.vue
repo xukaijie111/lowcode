@@ -8,7 +8,7 @@
     
     let rules = ref({
         name:[
-          
+            { required :true,message:"请输入名称"}
         ],
         description:[
             { required :true,message:"请输入描述"}
@@ -45,8 +45,8 @@
     }
 
 
-    const onCreateClick = () => {
-        if (!checkValid()) return false;
+    const onCreateClick = async () => {
+        if (!await checkValid()) return false;
         emit('confirm',data.value);
     }
 
@@ -57,10 +57,10 @@
     <div class="wrap">
           <el-form :inline="true"
             ref="sRef"
-            show-close="false"
+ 
              :model="data" class="demo-form-inline align-left" :rules = "rules">
                 <el-form-item label="名称"  prop = "name">
-                    <el-input v-model="data.name" placeholder="请输入流程名称" />
+                    <el-input v-model.trim="data.name" placeholder="请输入流程名称" />
                 </el-form-item>
 
                   <el-form-item label="描述"  prop = "description">
@@ -80,6 +80,8 @@
 <style lang="less" scoped>
 
 .wrap {
+    display: flex;
+    align-items: center;
 
 }
 

@@ -62,9 +62,9 @@ export class Request {
                     var result = response.data;
                     if (result && result.success) return result.data
                     else {
-                        if (result.errorMsg) {
-                            ElMessage.error(result.errorMsg);
-                        }
+                        // if (result.errorMsg) {
+                        //     ElMessage.error(result.errorMsg);
+                        // }
                         return Promise.reject(result);
                     } 
 

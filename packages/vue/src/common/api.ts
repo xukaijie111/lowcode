@@ -27,3 +27,20 @@ export const getProcessList = (data) => {
     data
   })
 }
+
+
+export const createProcess = (data) => {
+    return apiRequest({
+        url:'/process/edit',
+        method:'POST',
+        data
+      }) 
+}
+
+export const deleteProcess = (ids) => {
+    return apiRequest({
+        url:'/process/delete',
+        method:'POST',
+        data: { ids }
+      }) 
+}
