@@ -2,7 +2,7 @@
 
 <script lang="ts" setup>
 
-import { ref } from 'vue';
+import { ref ,watch} from 'vue';
 import { EditorSelection, EditorState, StateEffect,Extension ,Transaction} from '@codemirror/state';
 import { EditorView, keymap } from '@codemirror/view';
 import { linter, lintGutter } from '@codemirror/lint';
@@ -11,6 +11,7 @@ import { indentWithTab,defaultKeymap } from '@codemirror/commands';
 import {javascript} from "@codemirror/lang-javascript"
 import { onMounted } from 'vue';
 import type {Node} from '@antv/x6'
+
 
 type MapValue = {
     node:Node,
@@ -33,6 +34,14 @@ function dummyKeymap() {
   }])
 }
 
+const props = defineProps<
+    {
+        node:Node
+    }
+>()
+
+
+
 const getExtensions = () => {
     let extensions : Extension[] = [
         basicSetup,
@@ -51,12 +60,17 @@ const init = () => {
         doc: "Hello World",
         extensions: getExtensions(),
         parent: document.getElementById('editor') as Element,
-       
     })
 
 }
 
 const update = (node:Node) => {
+    if (!node) {
+        view.value?.dispatch({
+        changes: { from: 0, to: 1, insert: '' }
+      });
+        return 
+    }
     let id = node.id;
     let exit = cacheMap.get(id);
     if (!exit) {
@@ -78,6 +92,14 @@ onMounted(()=>{
 defineExpose({
     update
 })
+
+watch(
+    () => props.node,
+    (newValue) => {
+        console.log(`node 改变了`)
+        update(newValue)
+    }
+)
 
 
 

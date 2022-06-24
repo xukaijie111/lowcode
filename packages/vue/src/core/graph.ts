@@ -10,13 +10,21 @@ export class mGraph extends Event {
     stencil: Addon.Stencil
     ports = mGraph.defaultPorts
     container: HTMLElement
-  
+    data:Record<any,any>
     constructor() {
         super();
     }
 
     public getGraph() {
         return this.graph
+    }
+
+    setData(data) {
+        this.data = data;
+    }
+
+    getName() {
+        return this.data.name;
     }
 
     fromJSON(config) {

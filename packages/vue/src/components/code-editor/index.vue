@@ -20,33 +20,53 @@ let dialogVisible = ref(false)
 let sideBarRef = ref();
 let tabBarRef = ref();
 let mainRef = ref();
-let codeAreaRef = ref();
-let activeNodeId = ref();
-let code = ref('');
+let currentNode = ref();
 let nodes = ref<Array<Node>>();
 
 
+const setCurrentNode = (node) => {
+    if (!node) {
+        currentNode.value = null;
+        return;
+    }
+    currentNode.value = node;
+}
 const openEditor = (node: Node) => {
     dialogVisible.value = true;
     nodes.value = props.mgraph.getGraph().getNodes();
     nextTick(() => {
         sideBarRef.value.update();
-        tabBarRef.value.update();
+      //  tabBarRef.value.update();
         onClickSideBarItem(node);
     })
 }
 
 const onClickSideBarItem = (node: Node) => {
-    activeNodeId.value = node.id;
+    setCurrentNode(node);
     tabBarRef.value.addNode(node);
 
 }
 
-watch(activeNodeId, (newValue) => {
-    let currentNode = _.find(nodes.value, { id: newValue });
-    if (!currentNode) return;
-    mainRef.value.update(currentNode);
-})
+
+const closeCurrentTab = () => {
+    let preNode = currentNode.value;
+    console.log(`###preNode is `,preNode);
+    let preId = preNode.id;
+    let opendNodes = tabBarRef.value.getNodes();
+    let index = _.findIndex(opendNodes,{ id:preId });
+    if (index === 0 ) {
+        if (opendNodes[1])
+         setCurrentNode(opendNodes[1])
+        else setCurrentNode(null)
+    }else {
+       setCurrentNode(opendNodes[index-1]);
+    }
+    tabBarRef.value.deleteNode(preNode.id)
+}
+
+const onClickTab = (node) => {
+        currentNode.value = node;
+}
 
 
 defineExpose({
@@ -65,12 +85,15 @@ defineExpose({
                     
             </div>
             <div class="content-wrap w-full">
-                <CodeEditorSideBarVue :activeNodeId="activeNodeId" @click-item="onClickSideBarItem" ref="sideBarRef"
+                <CodeEditorSideBarVue :node="currentNode" @click-item="onClickSideBarItem" ref="sideBarRef"
                     :mgraph="props.mgraph" />
                 <div class="code-wrap h-full">
-                    <CodeEditorTabBarVue :activeNodeId="activeNodeId" :mgraph="props.mgraph" ref="tabBarRef" />
+                    <CodeEditorTabBarVue 
+                    @click="onClickTab"
+                    @close="closeCurrentTab"
+                    :node="currentNode" :mgraph="props.mgraph" ref="tabBarRef" />
 
-                    <CodeEditorMainVue ref="mainRef" />
+                    <CodeEditorMainVue ref="mainRef" :node="currentNode"/>
                 </div>
             </div>
 

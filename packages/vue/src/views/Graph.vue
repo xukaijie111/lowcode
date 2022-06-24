@@ -8,7 +8,7 @@ import x6GraphInfoVue from '../components/x6-graph-info.vue'
 import _ from 'lodash'
 import { useRoute } from 'vue-router'
 import { createProcess , getProcessDetail , saveDsl } from '../common/api'
-import { ElMessage } from 'element-plus';
+import { ElMessage, menuItemGroupProps } from 'element-plus';
 
 
 
@@ -49,6 +49,8 @@ const onConfirmDialog = async (_data) => {
     loading.value = false;
     await nextTick();
     createGraph();
+
+    mgraph.value?.setData(data.value);
 }
 
 const create = async () => {
@@ -62,6 +64,7 @@ const _getProcessDetail = async () => {
         let { basic ,config} = res;
         data.value = basic;
         mgraph.value?.fromJSON(config);
+        mgraph.value?.setData(basic)
 
 }
 

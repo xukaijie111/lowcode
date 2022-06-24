@@ -9,14 +9,22 @@ import _ from 'lodash';
 let props = defineProps<
   {
     mgraph: mGraph
-    activeNodeId:string
+    node:Node
   }
+>()
+
+let emits = defineEmits<
+{
+  (e:"close"):void
+  (e:'click',node:Node)
+}
 >()
 
 let opendNodes = ref<Array<Node>>([]);
 
 const handleCurrentTab = (node: Node) => {
-
+  if (node.id === props.node.id) return;
+  emits('click',node)
 }
 
 const addNode = (node: Node) => {
@@ -25,22 +33,31 @@ const addNode = (node: Node) => {
   }
 }
 
-const update = () => {
-  let nodes = props.mgraph.getGraph().getNodes();
-  let ids = nodes.map((n) => n.id)
-  opendNodes.value = _.filter(opendNodes.value,(node) => {
-      return ids.includes(node.id);
-  })
+const deleteNode = (id) => {
+  let index = _.findIndex(opendNodes.value, { id })
+  if (index !== -1) {
+    opendNodes.value.splice(index,1)
+  }
 }
+
 
 const getNodeName = (node: Node) => {
   let data = node.getData();
   return data.base.name || "未命名"
 }
 
+const onCloseClick = () => {
+  emits('close')
+}
+
+const getNodes = () => {
+  return opendNodes.value;
+}
+
 defineExpose({
   addNode,
-  update
+  getNodes,
+  deleteNode
 })
 
 
@@ -51,10 +68,10 @@ defineExpose({
   <div id="editorTabBar" class="noselect">
     <div class="tab-list " ref="tabList">
       <div v-for="(item, index) in opendNodes" :key="index" class="editor-tab  flex-center"
-        :class="props.activeNodeId === item.id ? 'active-tab' : ''" @click="handleCurrentTab(item as Node)">
+        :class="props.node && props.node.id === item.id ? 'active-tab' : ''" @click="handleCurrentTab(item as Node)">
         {{ getNodeName(item as Node) }}
 
-        <el-icon class="close-icon" color="white" size="10"><Close /></el-icon>
+        <el-icon class="close-icon" color="white" size="10" @click="onCloseClick"><Close /></el-icon>
       </div>
     </div>
   </div>
