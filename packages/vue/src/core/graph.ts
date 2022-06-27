@@ -19,7 +19,7 @@ export class mGraph extends Event {
         return this.graph
     }
 
-    setData(data) {
+    setData(data:Record<any,any>) {
         this.data = data;
     }
 
@@ -27,7 +27,7 @@ export class mGraph extends Event {
         return this.data.name;
     }
 
-    fromJSON(config) {
+    fromJSON(config:Record<any,any>) {
         return this.graph.fromJSON(config);
     }
 

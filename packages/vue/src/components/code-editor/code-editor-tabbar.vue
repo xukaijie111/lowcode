@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 
-import { ref } from 'vue';
+import { ref,watch } from 'vue';
 import type { Node } from '@antv/x6'
 import { mGraph } from '../../core/graph';
 import { Close } from '@element-plus/icons-vue'
@@ -9,14 +9,15 @@ import _ from 'lodash';
 let props = defineProps<
   {
     mgraph: mGraph
-    node:Node
+    node:Node,
+    map:Map<string,unknown>
   }
 >()
 
 let emits = defineEmits<
 {
   (e:"close"):void
-  (e:'click',node:Node)
+  (e:'click',node:Node):void
 }
 >()
 
@@ -33,7 +34,7 @@ const addNode = (node: Node) => {
   }
 }
 
-const deleteNode = (id) => {
+const deleteNode = (id:string) => {
   let index = _.findIndex(opendNodes.value, { id })
   if (index !== -1) {
     opendNodes.value.splice(index,1)
@@ -59,6 +60,13 @@ defineExpose({
   getNodes,
   deleteNode
 })
+
+watch(
+  () => props.map,
+  (newValue) => {
+    console.log(`map 改變了`)
+  }
+)
 
 
 </script>

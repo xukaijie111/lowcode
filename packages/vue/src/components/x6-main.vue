@@ -3,7 +3,7 @@
     import { mGraph } from '../core/graph'
 
  
-     const init = (mgraph:mGraph,options) => {
+     const init = (mgraph:mGraph,options:Record<any,any>) => {
         mgraph.createGraph({
             ...options,
             container:document.getElementById('graph') as HTMLElement

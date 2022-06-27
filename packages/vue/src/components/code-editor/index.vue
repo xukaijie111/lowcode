@@ -1,14 +1,24 @@
 
 <script lang="ts" setup>
 
-import { ref, nextTick, watch } from 'vue'
+import { ref, nextTick } from 'vue'
 import type { Node } from '@antv/x6'
 import { mGraph } from '../../core/graph';
 import CodeEditorSideBarVue from './code-editor-sidebar.vue'
 import CodeEditorTabBarVue from './code-editor-tabbar.vue'
 import CodeEditorMainVue from './code-editor-main.vue';
+import { Close } from '@element-plus/icons-vue'
+import { ElMessageBox } from 'element-plus'
+
 
 import _ from 'lodash';
+
+type MapValue = {
+    dirty: boolean,
+    source: string
+}
+
+const mapCache = ref(new Map<string, MapValue>());
 
 let props = defineProps<
     {
@@ -21,51 +31,171 @@ let sideBarRef = ref();
 let tabBarRef = ref();
 let mainRef = ref();
 let currentNode = ref();
-let nodes = ref<Array<Node>>();
+let nodes: Array<Node> = []
 
 
-const setCurrentNode = (node) => {
-    if (!node) {
-        currentNode.value = null;
+// 重置cache
+const resetCache = (id?: string) => {
+    mapCache.value.clear();
+    let nodes = props.mgraph.getGraph().getNodes();
+    if (id) {
+        let node = _.find(nodes, { id })
+        if (node) {
+            mapCache.value.set(id, {
+                dirty: false,
+                source: node.getData().code.source
+            })
+        }
         return;
     }
+    nodes.forEach((node) => {
+        let _id = node.id;
+        mapCache.value.set(_id, {
+            dirty: false,
+            source: node.getData().code.source
+        })
+    })
+
+}
+
+const getCacheCode = (node:Node) => {
+    let id = node.id;
+    let data = mapCache.value.get(id);
+    if (data) return data.source
+}
+
+const getNodeById = (id: string) => {
+
+    let node = _.find(nodes, { id });
+    return node;
+}
+
+const checkCurrentHasChange = () => {
+    let id = currentNode.value?.id as string;
+    let doc = mainRef.value.getCurrentCM();
+    let map = mapCache.value.get(id);
+    if (map) {
+        let source = map.source
+        if (source !== doc) return true;
+    }
+    return false;
+}
+
+
+// 切换tab的时候，保存临时写的代码
+const flushToMap = () => {
+    let id = currentNode.value?.id as string;
+    let map = mapCache.value.get(id);
+    if (map) {
+        let doc = mainRef.value.getCurrentCM();
+        let source = map.source;
+        if (doc !== source) {
+            map.dirty = true;
+            map.source = doc;
+        }
+    }
+}
+
+// 手动保存的时候，flush到Node
+const flushToNode = (id?: string | Array<string>) => {
+
+    if (Array.isArray(id)) {
+        id.forEach((i) => flushToNode(i));
+        return;
+    }
+
+    id = id || currentNode.value?.id as string;
+    let doc = mainRef.value.getCurrentCM();
+    let map = mapCache.value.get(id);
+    if (map) {
+        let node = getNodeById(id) as Node;
+        let data = node.getData();
+        data.source = doc;
+        node.setData(data);
+        map.dirty = false;
+        map.source = doc;
+    }
+}
+
+const setCurrentNode = (node: Node | null) => {
+    if (!node) {
+        //@ts-ignore
+        currentNode.value = null;
+        mainRef.value.update('')
+        return;
+    }
+    mainRef.value.update(getCacheCode(node));
     currentNode.value = node;
 }
 const openEditor = (node: Node) => {
+    resetCache();
     dialogVisible.value = true;
-    nodes.value = props.mgraph.getGraph().getNodes();
+    nodes = props.mgraph.getGraph().getNodes();
     nextTick(() => {
         sideBarRef.value.update();
-      //  tabBarRef.value.update();
+        //  tabBarRef.value.update();
         onClickSideBarItem(node);
     })
 }
 
 const onClickSideBarItem = (node: Node) => {
+
+    flushToMap();
     setCurrentNode(node);
     tabBarRef.value.addNode(node);
-
 }
 
 
-const closeCurrentTab = () => {
-    let preNode = currentNode.value;
-    console.log(`###preNode is `,preNode);
-    let preId = preNode.id;
-    let opendNodes = tabBarRef.value.getNodes();
-    let index = _.findIndex(opendNodes,{ id:preId });
-    if (index === 0 ) {
-        if (opendNodes[1])
-         setCurrentNode(opendNodes[1])
-        else setCurrentNode(null)
-    }else {
-       setCurrentNode(opendNodes[index-1]);
+const closeCurrentTab = async () => {
+
+    if (checkCurrentHasChange()) {
+
+        try {
+            await ElMessageBox.confirm(
+                '是否保存修改',
+                '提示',
+                {
+                    distinguishCancelAndClose: true,
+                    confirmButtonText: '保存',
+                    cancelButtonText: '不保存',
+                    type: 'warning',
+                }
+
+            )
+
+            flushToNode();
+           
+        } catch (err) {
+           if (err === "close") return;
+           else resetCache(currentNode.value.id);
+        }
     }
-    tabBarRef.value.deleteNode(preNode.id)
+
+    let preNode = currentNode;
+    let preId = preNode.value.id;
+    let opendNodes = tabBarRef.value.getNodes();
+    let index = _.findIndex(opendNodes, { id: preId });
+    if (index === 0) {
+        if (opendNodes[1])
+            setCurrentNode(opendNodes[1])
+        else setCurrentNode(null)
+    } else {
+        setCurrentNode(opendNodes[index - 1]);
+    }
+    tabBarRef.value.deleteNode(preNode.value.id)
 }
 
-const onClickTab = (node) => {
-        currentNode.value = node;
+const onClickTab = (node: Node) => {
+    flushToMap();
+    setCurrentNode(node);
+}
+
+const onCloseClick = () => {
+
+}
+
+const saveCurrentCM = () => {
+    flushToNode();
 }
 
 
@@ -81,19 +211,19 @@ defineExpose({
         <el-dialog v-model="dialogVisible" width="80%" top="5vh">
 
             <div slot="header" class="header flex-center relative">
-                {{mgraph.getName()}}
-                    
+                {{ mgraph.getName() }}
+                <el-icon class="close-icon" color="black" size="12" @click="onCloseClick">
+                    <Close />
+                </el-icon>
             </div>
             <div class="content-wrap w-full">
                 <CodeEditorSideBarVue :node="currentNode" @click-item="onClickSideBarItem" ref="sideBarRef"
                     :mgraph="props.mgraph" />
                 <div class="code-wrap h-full">
-                    <CodeEditorTabBarVue 
-                    @click="onClickTab"
-                    @close="closeCurrentTab"
-                    :node="currentNode" :mgraph="props.mgraph" ref="tabBarRef" />
+                    <CodeEditorTabBarVue @click="onClickTab" @close="closeCurrentTab" :node="currentNode"
+                        :mgraph="props.mgraph" ref="tabBarRef" />
 
-                    <CodeEditorMainVue ref="mainRef" :node="currentNode"/>
+                    <CodeEditorMainVue @save="saveCurrentCM" ref="mainRef" :node="currentNode" />
                 </div>
             </div>
 
@@ -105,6 +235,8 @@ defineExpose({
 
 <style lang="less" scoped>
 .editor-wrap {
+
+
     :deep(.el-dialog__body) {
         padding: 0px;
     }
@@ -118,7 +250,15 @@ defineExpose({
     }
 
     .header {
+        position: relative;
 
+        .close-icon {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
     }
 }
 

@@ -12,7 +12,7 @@ const router = useRouter();
 
 const baseRef = ref();
 
-let searchConfirm = async (query, page) => {
+let searchConfirm = async (query:object, page:object) => {
     let body = {
         ...query,
         ...page

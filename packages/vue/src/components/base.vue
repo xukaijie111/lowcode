@@ -57,6 +57,7 @@ const initQuery = () => {
     let items = props.search.items;
     for (let item of items) {
         let { key, value } = item;
+        //@ts-ignore
         query.value[key] = _.cloneDeep(value);
     }
 }
@@ -76,7 +77,7 @@ const emits = defineEmits<
 
 initQuery();
 
-const handleCurrentChange = (val) => {
+const handleCurrentChange = (val:number) => {
     console.log(`###val is `, val)
 }
 
@@ -151,6 +152,7 @@ defineExpose({
             <el-form :inline="true" ref="sRef" :model="query" class="demo-form-inline align-left"
                 :rules="props.search.rules">
                 <el-form-item :label="item.title" v-for="item in props.search.items" :prop="item.key">
+
                     <el-input v-model.trim="query[item.key]" :placeholder="item.placeholder" />
                 </el-form-item>
 

@@ -2,107 +2,85 @@
 
 <script lang="ts" setup>
 
-import { ref ,watch} from 'vue';
-import { EditorSelection, EditorState, StateEffect,Extension ,Transaction} from '@codemirror/state';
+import { ref, nextTick } from 'vue';
+import { Extension } from '@codemirror/state';
 import { EditorView, keymap } from '@codemirror/view';
-import { linter, lintGutter } from '@codemirror/lint';
-import { basicSetup, minimalSetup } from 'codemirror';
-import { indentWithTab,defaultKeymap } from '@codemirror/commands';
-import {javascript} from "@codemirror/lang-javascript"
+//import { linter, lintGutter } from '@codemirror/lint';
+import { basicSetup } from 'codemirror';
+import { indentWithTab } from '@codemirror/commands';
+import { javascript } from "@codemirror/lang-javascript"
 import { onMounted } from 'vue';
-import type {Node} from '@antv/x6'
 
 
-type MapValue = {
-    node:Node,
-    data:Record<any,any>
-}
 
-let state = ref<EditorState>();
+let emits = defineEmits< {
+    (e:"save"):void
+}>()
+
+
 let view = ref<EditorView>();
 
-let cacheMap = new Map<string,MapValue>()
 
 function dummyKeymap() {
-  return keymap.of([{
-    key: "cmd-s",
-    run() {
-         console.log(111)
-         return true 
-    },
-    preventDefault:true
-  }])
+    return keymap.of([{
+        key: "cmd-s",
+        run() {
+            emits('save');
+            return true
+        },
+        preventDefault: true
+    }])
 }
-
-const props = defineProps<
-    {
-        node:Node
-    }
->()
-
 
 
 const getExtensions = () => {
-    let extensions : Extension[] = [
+    let extensions: Extension[] = [
         basicSetup,
         javascript(),
-        EditorView.theme({},{dark:false}),
+        EditorView.theme({}, { dark: false }),
         EditorView.lineWrapping,
         dummyKeymap(),
-        keymap.of([indentWithTab]) 
+
+        keymap.of([indentWithTab]),
     ]
 
     return extensions;
 }
 
-const init = () => {
+const init = async () => {
     view.value = new EditorView({
-        doc: "Hello World",
+        doc: "",
         extensions: getExtensions(),
         parent: document.getElementById('editor') as Element,
+
     })
 
+    await nextTick();
+
 }
 
-const update = (node:Node) => {
-    if (!node) {
-        view.value?.dispatch({
-        changes: { from: 0, to: 1, insert: '' }
-      });
-        return 
-    }
-    let id = node.id;
-    let exit = cacheMap.get(id);
-    if (!exit) {
-        exit = { node,data:node.getData()}
-        cacheMap.set(id,exit)
-    }
+const getCurrentCM = () => {
+    return view.value?.state.doc.toString();
+}
 
-    let source = exit.data.code.source;
+
+const update = (source:string) => {
+
+   let doc = view.value?.state.doc.toString() || "";
 
     view.value?.dispatch({
-        changes: { from: 0, to: source.length, insert: source }
-      });
+        changes: { from: 0, to: doc.length, insert: source }
+    });
 }
 
-onMounted(()=>{
+onMounted(() => {
     init();
 })
 
 defineExpose({
-    update
+    update,
+    getCurrentCM
 })
-
-watch(
-    () => props.node,
-    (newValue) => {
-        console.log(`node 改变了`)
-        update(newValue)
-    }
-)
-
-
-
 
 </script>
 
@@ -113,15 +91,17 @@ watch(
 </template>
 
 <style lang="less" scoped>
-.vue-codemirror{
+.vue-codemirror {
     height: 0px;
     flex: 1;
+
     :deep(.cm-editor) {
         height: 100%;
     }
+
     :deep(.cm-line) {
         text-align: left;
     }
-    
+
 }
 </style>
