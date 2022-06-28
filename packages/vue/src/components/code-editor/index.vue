@@ -87,8 +87,7 @@ const checkCurrentHasChange = () => {
 }
 
 const checkCacheHasChange = () => {
-
-    for (let [id,value] of mapCache.value) {
+    for (let [,value] of mapCache.value) {
         if (value.dirty) return true;
     }
     return false;

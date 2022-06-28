@@ -41,7 +41,7 @@ type Table = {
     list: Array<TableItem>
 }
 
-let query = ref({});
+let query = ref<Record<any,any>>({});
 let sRef = ref();
 
 let page = ref({

@@ -31,8 +31,7 @@ export class Controller {
             }
         })
 
-        console.log(`###query is `,query,keys);
-    
+
         let total = await this.collect.countDocuments(query);
     
         let list = await this.collect.find(query).skip(pageSize*(pageNum - 1)).limit(pageNum*pageSize).toArray();

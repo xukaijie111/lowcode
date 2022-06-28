@@ -89,8 +89,8 @@ defineExpose({
   getNextNode
 })
 
-const getItemClass = (item) => {
-  let param = {}
+const getItemClass = (item:Node) => {
+  let param:Record<any,any> = {}
   let { id } = item
   if (props.activeId && props.activeId === id) {
     param[ 'active-tab'] = true;
@@ -121,7 +121,7 @@ watch(
   <div id="editorTabBar" class="noselect">
     <div class="tab-list " ref="tabList">
       <div v-for="(item, index) in opendNodes" :key="index" class="editor-tab  flex-center"
-        v-bind:class="getItemClass(item)"
+        v-bind:class="getItemClass(item as Node)"
        @click="handleCurrentTab(item as Node)">
         {{ getNodeName(item as Node) }}
 

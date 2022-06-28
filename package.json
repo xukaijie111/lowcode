@@ -15,7 +15,15 @@
     "type": "git",
     "url": "git+https://github.com/xukaijie111/ManonDo.git"
   },
-  "keywords": [],
+  "keywords": [
+    "lowcode",
+    "codemirror6",
+    "vue3",
+    "vite",
+    "typescript",
+    "express",
+    "mongodb"
+  ],
   "author": "bajie",
   "license": "ISC",
   "bugs": {

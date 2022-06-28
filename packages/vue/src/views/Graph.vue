@@ -25,6 +25,13 @@ let data = ref({
 })
 let id = ref();
 
+const onConfirmProcessBasicInfo = async (_data:unknown) => {
+     //@ts-ignore
+    data.value = _.cloneDeep(_data);
+    await saveDsl(id.value,{ basic : data.value});
+    ElMessage.success(`保存成功`)
+}
+
 
 const createGraph = async (options = {}) => {
     mgraph.value = new mGraph();
@@ -128,7 +135,7 @@ const onDeployDsl = () => {
 
 
             <div class="base-info">
-                <x6GraphInfoVue :data="data" />
+                <x6GraphInfoVue :data="data" @confirm="onConfirmProcessBasicInfo"/>
             </div>
 
             <div class="x6-main">

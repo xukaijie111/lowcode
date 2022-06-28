@@ -4,6 +4,7 @@ import { Mongodb } from '../mongo/index'
 import { IResponse } from '../app'
 import * as _ from 'lodash'
 import { Controller } from './base.controller';
+import * as path from 'path';
 
 export  class ProcessController extends Controller {
     public path = "/process";
@@ -22,6 +23,7 @@ export  class ProcessController extends Controller {
         this.router.post(`${this.path}/edit`, this.processEdit);
         this.router.post(`${this.path}/detail`, this.getDetail);
         this.router.post(`${this.path}/delete`, this.processDelete);
+        this.router.post(`${this.path}/deploy`, this.deployDsl);
     }
 
     private  getProcessList = async (request:Request,response:IResponse,next:NextFunction) => {
@@ -55,6 +57,14 @@ export  class ProcessController extends Controller {
     private processDelete = async (request:Request,response:IResponse,next:NextFunction) => {
 
         await super.delete(request.body)
+        return response.ok(null);
+    }
+
+
+    private deployDsl = async (request:Request,response:IResponse,next:NextFunction) => {
+
+
+
         return response.ok(null);
     }
 
