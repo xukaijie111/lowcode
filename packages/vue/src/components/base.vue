@@ -31,7 +31,7 @@ type TableItem = {
 
 type Operate = {
     delete?: boolean,
-    detail?: Function
+    detail?: boolean
 }
 
 type Table = {
@@ -71,7 +71,7 @@ let props = defineProps<
 
 const emits = defineEmits<
     {
-        (e:"detail",data:unknown):void
+        (e:"detail",data:Record<any,any>):void
     }
 >()
 
@@ -102,7 +102,7 @@ const onCreateClick = () => {
     props.search?.create();
 }
 
-const handleDetail = (row:unknown) => {
+const handleDetail = (row:Record<any,any>) => {
     emits('detail',row)
 }
 
@@ -138,6 +138,7 @@ const onMultDeleteClick = () => {
 const handleSelectionChange = (rows:Array<unknown>) => {
     selected = rows;
 }
+
 
 defineExpose({
     onSubmitClick

@@ -25,10 +25,13 @@ export class Controller {
         let query:Record<any,any> = {};
         keys.forEach((key) => {
             let value = body[key];
+           if (value)
             query[key] = {
                 $regex: new RegExp(value,'i')
             }
         })
+
+        console.log(`###query is `,query,keys);
     
         let total = await this.collect.countDocuments(query);
     

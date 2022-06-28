@@ -81,6 +81,13 @@ const checkCurrentHasChange = () => {
     return false;
 }
 
+const checkCacheHasChange = () => {
+
+    for (let [id,value] of mapCache.value) {
+        if (value.dirty) return true;
+    }
+    return false;
+}
 
 // 切换tab的时候，保存临时写的代码
 const flushToMap = () => {
@@ -145,13 +152,10 @@ const onClickSideBarItem = (node: Node) => {
     tabBarRef.value.addNode(node);
 }
 
-
-const closeCurrentTab = async () => {
-
-    if (checkCurrentHasChange()) {
-
-        try {
-            await ElMessageBox.confirm(
+const saveConfirm = async () => {
+    let ret
+    try {
+            ret = await ElMessageBox.confirm(
                 '是否保存修改',
                 '提示',
                 {
@@ -166,9 +170,21 @@ const closeCurrentTab = async () => {
             flushToNode();
            
         } catch (err) {
-           if (err === "close") return;
-           else resetCache(currentNode.value.id);
+         return err
         }
+
+        return ret;
+}
+
+
+const closeCurrentTab = async () => {
+
+    if (checkCurrentHasChange()) {
+        let ret = await saveConfirm();
+        if (ret === "close") return;
+        if (ret === "cancel") resetCache(currentNode.value.id);
+        if (ret === "confirm") flushToNode(currentNode.value.id);
+       
     }
 
     let preNode = currentNode;
@@ -190,7 +206,16 @@ const onClickTab = (node: Node) => {
     setCurrentNode(node);
 }
 
-const onCloseClick = () => {
+const onCloseClick = async () => {
+
+    if (checkCacheHasChange() || checkCacheHasChange()) {
+        let ret = await saveConfirm();
+        if (ret === "close") return;
+        if (ret === "cancel") resetCache();
+        if (ret === "confirm") flushToNode();
+    }
+
+dialogVisible.value = false;
 
 }
 
@@ -220,7 +245,9 @@ defineExpose({
                 <CodeEditorSideBarVue :node="currentNode" @click-item="onClickSideBarItem" ref="sideBarRef"
                     :mgraph="props.mgraph" />
                 <div class="code-wrap h-full">
-                    <CodeEditorTabBarVue @click="onClickTab" @close="closeCurrentTab" :node="currentNode"
+                    <CodeEditorTabBarVue 
+                    :map="mapCache"
+                    @click="onClickTab" @close="closeCurrentTab" :node="currentNode"
                         :mgraph="props.mgraph" ref="tabBarRef" />
 
                     <CodeEditorMainVue @save="saveCurrentCM" ref="mainRef" :node="currentNode" />

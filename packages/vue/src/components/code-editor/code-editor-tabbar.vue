@@ -61,10 +61,27 @@ defineExpose({
   deleteNode
 })
 
+const getItemClass = (item) => {
+  let param = {}
+  let { id } = item
+  if (props.node && props.node.id === id) {
+    param[ 'active-tab'] = true;
+  }
+
+  let mapData = props.map.get(id);
+  //@ts-ignore
+   if (mapData&& mapData.dirty) param['dirty'] = true;
+
+  return param
+}
+
 watch(
   () => props.map,
   (newValue) => {
-    console.log(`map 改變了`)
+    
+  },
+  {
+    deep:true
   }
 )
 
@@ -76,7 +93,8 @@ watch(
   <div id="editorTabBar" class="noselect">
     <div class="tab-list " ref="tabList">
       <div v-for="(item, index) in opendNodes" :key="index" class="editor-tab  flex-center"
-        :class="props.node && props.node.id === item.id ? 'active-tab' : ''" @click="handleCurrentTab(item as Node)">
+        v-bind:class="getItemClass(item)"
+       @click="handleCurrentTab(item as Node)">
         {{ getNodeName(item as Node) }}
 
         <el-icon class="close-icon" color="white" size="10" @click="onCloseClick"><Close /></el-icon>
@@ -131,6 +149,12 @@ watch(
       position: relative;
       cursor: pointer;
 
+    &.dirty {
+      color: rgb(226,192,141);
+      &:hover{
+        color: rgb(234, 166, 63);;
+      }
+    }
       .close-icon {
         right: 0px;
         top: 0px;

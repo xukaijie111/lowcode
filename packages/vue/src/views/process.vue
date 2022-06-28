@@ -54,16 +54,19 @@ let table = ref({
     index: true,
     multSelect: true,
     operate: {
-        'delete': true
+        'delete': true,
+        'detail':true
     },
     list: [
         {
             title: "名称",
-            key: "name"
+            key: "base",
+            slot:"tname"
         },
         {
             title: "描述",
-            key: "description"
+            key: "base",
+            slot:"tdesc"
         }
     ]
 })
@@ -72,6 +75,11 @@ onMounted(() => {
     baseRef.value.onSubmitClick();
 })
 
+const handleDetail = (row:Record<any,any>) => {
+  let { id } = row;
+  router.push(`/graph/${id}`)
+}
+
 
 </script>
 
@@ -79,8 +87,15 @@ onMounted(() => {
 
     <div class="process-wrap h-full">
 
-        <BaseVue :search="search" :table="table" ref="baseRef"></BaseVue>
+        <BaseVue 
+        @detail="handleDetail"
+        :search="search" :table="table" ref="baseRef">
+        
+            <template slot="tname" v-slot:tname="scope"><div>{{scope.row.basic?scope.row.basic.name:""}}</div></template>
+            <template slot="tdesc" v-slot:tdesc="scope"><div>{{scope.row.basic?scope.row.basic.description:""}}</div></template>
+        </BaseVue>
     </div>
+
 
 </template>
 
