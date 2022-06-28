@@ -7,7 +7,7 @@ import { mGraph } from '../../core/graph';
     let props = defineProps<
         {
             mgraph:mGraph,
-            node:Node
+            activeId:string
         }
     >()
 
@@ -48,7 +48,7 @@ defineExpose({
      <div 
 
      @click="onClickitem(index)"
-     :class="props.node && props.node.id === item.id ? 'active-item' : ''"
+     :class="props.activeId && props.activeId === item.id ? 'active-item' : ''"
      v-for="(item,index) in listNodes" class="item w-full ellipsis">{{getNodeName(item as Node)}}</div>
    
   </div>

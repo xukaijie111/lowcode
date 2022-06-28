@@ -9,7 +9,7 @@ import _ from 'lodash';
 let props = defineProps<
   {
     mgraph: mGraph
-    node:Node,
+    activeId:string,
     map:Map<string,unknown>
   }
 >()
@@ -24,8 +24,19 @@ let emits = defineEmits<
 let opendNodes = ref<Array<Node>>([]);
 
 const handleCurrentTab = (node: Node) => {
-  if (node.id === props.node.id) return;
+  if (props.activeId && node.id === props.activeId) return;
   emits('click',node)
+}
+
+const update = () => {
+  let nodes = props.mgraph.getGraph().getNodes();
+  for (let i = 0; i < opendNodes.value.length;i++) {
+    if (!_.find(nodes,{ id: opendNodes.value[i].id})) {
+      opendNodes.value.splice(i,1);
+      i--;
+    }
+
+  }
 }
 
 const addNode = (node: Node) => {
@@ -35,10 +46,29 @@ const addNode = (node: Node) => {
 }
 
 const deleteNode = (id:string) => {
+ 
   let index = _.findIndex(opendNodes.value, { id })
+
   if (index !== -1) {
     opendNodes.value.splice(index,1)
   }
+}
+
+const getNextNode = () => {
+    let currentNodeId = props.activeId;
+    let index = _.findIndex(opendNodes.value, { id:currentNodeId})
+    console.log(`###index is `,index);
+    if (index === -1) {
+      return console.error(`error why?`)
+    }
+    if (index === 0) {
+        if (opendNodes.value.length === 1) return null;
+        return opendNodes.value[index + 1];
+    }else {
+      return opendNodes.value[index - 1];
+    }
+
+
 }
 
 
@@ -51,20 +81,18 @@ const onCloseClick = () => {
   emits('close')
 }
 
-const getNodes = () => {
-  return opendNodes.value;
-}
 
 defineExpose({
   addNode,
-  getNodes,
-  deleteNode
+  deleteNode,
+  update,
+  getNextNode
 })
 
 const getItemClass = (item) => {
   let param = {}
   let { id } = item
-  if (props.node && props.node.id === id) {
+  if (props.activeId && props.activeId === id) {
     param[ 'active-tab'] = true;
   }
 
@@ -97,7 +125,7 @@ watch(
        @click="handleCurrentTab(item as Node)">
         {{ getNodeName(item as Node) }}
 
-        <el-icon class="close-icon" color="white" size="10" @click="onCloseClick"><Close /></el-icon>
+        <el-icon class="close-icon" color="white" size="10" @click.stop="onCloseClick"><Close /></el-icon>
       </div>
     </div>
   </div>

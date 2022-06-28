@@ -14,6 +14,7 @@ import { ElMessageBox } from 'element-plus'
 import _ from 'lodash';
 
 type MapValue = {
+    node:Node,
     dirty: boolean,
     source: string
 }
@@ -31,6 +32,7 @@ let sideBarRef = ref();
 let tabBarRef = ref();
 let mainRef = ref();
 let currentNode = ref();
+let activeId = ref();
 let nodes: Array<Node> = []
 
 
@@ -43,7 +45,8 @@ const resetCache = (id?: string) => {
         if (node) {
             mapCache.value.set(id, {
                 dirty: false,
-                source: node.getData().code.source
+                source: node.getData().code.source,
+                node,
             })
         }
         return;
@@ -52,7 +55,8 @@ const resetCache = (id?: string) => {
         let _id = node.id;
         mapCache.value.set(_id, {
             dirty: false,
-            source: node.getData().code.source
+            source: node.getData().code.source,
+            node
         })
     })
 
@@ -75,7 +79,8 @@ const checkCurrentHasChange = () => {
     let doc = mainRef.value.getCurrentCM();
     let map = mapCache.value.get(id);
     if (map) {
-        let source = map.source
+        let { source} = map
+        console.log(`###source is `,source,doc)
         if (source !== doc) return true;
     }
     return false;
@@ -128,11 +133,13 @@ const setCurrentNode = (node: Node | null) => {
     if (!node) {
         //@ts-ignore
         currentNode.value = null;
+        activeId.value = null
         mainRef.value.update('')
         return;
     }
     mainRef.value.update(getCacheCode(node));
     currentNode.value = node;
+    activeId.value = node.id;
 }
 const openEditor = (node: Node) => {
     resetCache();
@@ -140,13 +147,12 @@ const openEditor = (node: Node) => {
     nodes = props.mgraph.getGraph().getNodes();
     nextTick(() => {
         sideBarRef.value.update();
-        //  tabBarRef.value.update();
+        tabBarRef.value.update();
         onClickSideBarItem(node);
     })
 }
 
 const onClickSideBarItem = (node: Node) => {
-
     flushToMap();
     setCurrentNode(node);
     tabBarRef.value.addNode(node);
@@ -187,18 +193,10 @@ const closeCurrentTab = async () => {
        
     }
 
-    let preNode = currentNode;
-    let preId = preNode.value.id;
-    let opendNodes = tabBarRef.value.getNodes();
-    let index = _.findIndex(opendNodes, { id: preId });
-    if (index === 0) {
-        if (opendNodes[1])
-            setCurrentNode(opendNodes[1])
-        else setCurrentNode(null)
-    } else {
-        setCurrentNode(opendNodes[index - 1]);
-    }
-    tabBarRef.value.deleteNode(preNode.value.id)
+    let preNodeId = currentNode.value.id;
+    let nextNode = tabBarRef.value.getNextNode();
+    setCurrentNode(nextNode);
+    tabBarRef.value.deleteNode(preNodeId)
 }
 
 const onClickTab = (node: Node) => {
@@ -242,12 +240,12 @@ defineExpose({
                 </el-icon>
             </div>
             <div class="content-wrap w-full">
-                <CodeEditorSideBarVue :node="currentNode" @click-item="onClickSideBarItem" ref="sideBarRef"
+                <CodeEditorSideBarVue :activeId="activeId" @click-item="onClickSideBarItem" ref="sideBarRef"
                     :mgraph="props.mgraph" />
                 <div class="code-wrap h-full">
                     <CodeEditorTabBarVue 
                     :map="mapCache"
-                    @click="onClickTab" @close="closeCurrentTab" :node="currentNode"
+                    @click="onClickTab" @close="closeCurrentTab" :activeId="activeId"
                         :mgraph="props.mgraph" ref="tabBarRef" />
 
                     <CodeEditorMainVue @save="saveCurrentCM" ref="mainRef" :node="currentNode" />
