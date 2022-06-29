@@ -3,12 +3,16 @@
     "sourceMap": true,
     "target": "es2017",
     "outDir": "./dist",
-    "baseUrl": "./src",
-    "alwaysStrict": true,
-    "noImplicitAny": true,
+
+    "alwaysStrict": false,
+    "noImplicitAny": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@lowcode/*": ["../packages/*/src"],
+    }
   },
   "include": [
     "src/**/*.ts"

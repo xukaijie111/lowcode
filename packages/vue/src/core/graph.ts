@@ -1,5 +1,6 @@
 import { Graph, Shape, Addon, Node, Edge } from '@antv/x6'
 import { PortManager } from '@antv/x6/lib/model/port'
+import { NodeShape } from '@lowcode/shared'
 import _ from 'lodash'
 import {
     Event
@@ -62,7 +63,6 @@ export class mGraph extends Event {
 
         //undo redo
         graph.bindKey(['command+z', 'ctrl+z'], () => {
-            console.log(`###canundo is `,graph.history.canUndo())
             if (graph.history.canUndo()) {
                 graph.history.undo()
             }
@@ -111,7 +111,7 @@ export class mGraph extends Event {
         })
 
         Graph.registerNode(
-            'custom-rect',
+           NodeShape.CUSTOM_RECT,
             {
                 inherit: 'rect',
                 width: 66,
@@ -133,7 +133,7 @@ export class mGraph extends Event {
         )
 
         Graph.registerNode(
-            'custom-polygon',
+           NodeShape.CUSTOM_POLYGON,
             {
                 inherit: 'polygon',
 
@@ -189,7 +189,7 @@ export class mGraph extends Event {
         let { graph, stencil } = this
 
         const r1 = graph.createNode({
-            shape: mGraph.NodeShape.CUSTOM_RECT,
+            shape: NodeShape.CUSTOM_RECT,
             label: 'start',
             attrs: {
                 body: {
@@ -207,7 +207,7 @@ export class mGraph extends Event {
 
         })
         const r2 = graph.createNode({
-            shape: mGraph.NodeShape.CUSTOM_RECT,
+            shape: NodeShape.CUSTOM_RECT,
             label: '过程',
             data: {
                 ..._.cloneDeep(mGraph.defaultNodeData),
@@ -231,7 +231,7 @@ export class mGraph extends Event {
             }
         })
         const r4 = graph.createNode({
-            shape: mGraph.NodeShape.CUSTOM_POLYGON,
+            shape: NodeShape.CUSTOM_POLYGON,
             attrs: {
                 body: {
                     refPoints: '0,10 10,0 20,10 10,20',
@@ -264,9 +264,7 @@ export class mGraph extends Event {
        let { cells } = config;
 
         let edges = cells.filter((c) => c.shape === "edge")
-        let nodes = cells.filter((c) => mGraph.NodeShape[c.shape])
-
-        console.log(`#####edges is `,edges,nodes);
+        let nodes = cells.filter((c) => NodeShape[c.shape])
 
         let allEdgeNodes = edges.reduce((now,edge) => {
             now.push(edge.source.port);
@@ -307,10 +305,7 @@ export class mGraph extends Event {
 
 export namespace mGraph {
 
-    export const  NodeShape = {
-        'CUSTOM_RECT' : "custom-rect",
-        'CUSTOM_POLYGON' : "custom-polygon"
-    }
+  
 
     export interface PortMeta extends PortManager.PortMetadata {
         data: {

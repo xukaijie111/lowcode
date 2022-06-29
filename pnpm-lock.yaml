@@ -4,7 +4,7 @@ importers:
 
   .:
     specifiers:
-      '@manondo/shared': workspace:*
+      '@lowcode/shared': workspace:*
       '@microsoft/api-extractor': ^7.15.1
       '@rollup/plugin-commonjs': ^18.0.0
       '@rollup/plugin-json': ^4.0.0
@@ -54,7 +54,7 @@ importers:
       vite: ^2.6.0
       yorkie: ^2.0.0
     dependencies:
-      '@manondo/shared': link:packages/shared
+      '@lowcode/shared': link:packages/shared
       '@types/lodash': registry.npmmirror.com/@types/lodash/4.14.182
       axios: registry.npmmirror.com/axios/0.27.2
       d3: registry.npmmirror.com/d3/7.4.4
@@ -105,6 +105,9 @@ importers:
       vite: registry.npmmirror.com/vite/2.9.9
       yorkie: registry.npmmirror.com/yorkie/2.0.0
 
+  packages/core:
+    specifiers: {}
+
   packages/shared:
     specifiers: {}
 
@@ -117,6 +120,7 @@ importers:
       '@codemirror/state': ^6.0.1
       '@codemirror/view': ^6.0.1
       '@element-plus/icons-vue': ^2.0.4
+      '@lowcode/shared': 1.0.0
       '@vitejs/plugin-vue': ^2.3.3
       axios: ^0.27.2
       codemirror: ^6.0.0
@@ -142,6 +146,7 @@ importers:
       vue: registry.npmmirror.com/vue/3.2.36
       vue-router: registry.npmmirror.com/vue-router/4.0.15_vue@3.2.36
     devDependencies:
+      '@lowcode/shared': link:../shared
       '@vitejs/plugin-vue': registry.npmmirror.com/@vitejs/plugin-vue/2.3.3_vite@2.9.9+vue@3.2.36
       typescript: registry.npmmirror.com/typescript/4.7.2
       vite: registry.npmmirror.com/vite/2.9.9_less@4.1.2

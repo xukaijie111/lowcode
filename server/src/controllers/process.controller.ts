@@ -4,6 +4,7 @@ import { Mongodb } from '../mongo/index'
 import { IResponse } from '../app'
 import * as _ from 'lodash'
 import { Controller } from './base.controller';
+import { NodeShape } from '@lowcode/shared'
 import * as path from 'path';
 
 export  class ProcessController extends Controller {
@@ -74,7 +75,10 @@ export  class ProcessController extends Controller {
 
     // 精简元数据
     private destructDslMetaData(config) {
-
+        let 
+        let { cells } = config;
+        let edges = cells.filter((c) => c.shape === "edge")
+        let nodes = cells.filter((c) => )
     }
 
 

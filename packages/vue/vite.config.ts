@@ -10,7 +10,8 @@ export default defineConfig({
   ],
   resolve:{
     alias:{
-      '@':resolve(__dirname,'./src')
+      '@':resolve(__dirname,'./src'),
+      '@lowcode/shared':resolve(__dirname,'../shared/src/index.ts')
     },
     extensions:['.ts','.js']
   }

@@ -1,8 +1,8 @@
 {
-  "name": "@manondo/shared",
+  "name": "@lowcode/shared",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/es-index.js",
+  "main": "src/es-index.js",
   "module":"dist/cjs-index.js",
   "types": "dist/index.d.ts",
   "scripts": {

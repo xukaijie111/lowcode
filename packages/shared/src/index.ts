@@ -1,2 +1,7 @@
 
-console.log(1)
+
+
+  export const  NodeShape = {
+    'CUSTOM_RECT' : "custom-rect",
+    'CUSTOM_POLYGON' : "custom-polygon"
+}
