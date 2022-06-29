@@ -31,7 +31,7 @@ export class mGraph extends Event {
         return this.graph.fromJSON(config);
     }
 
-    toJson() {
+    toJSON() {
         return this.graph.toJSON();
     }
 
@@ -189,8 +189,8 @@ export class mGraph extends Event {
         let { graph, stencil } = this
 
         const r1 = graph.createNode({
-            shape: 'custom-rect',
-            label: '开始',
+            shape: mGraph.NodeShape.CUSTOM_RECT,
+            label: 'start',
             attrs: {
                 body: {
                     rx: 20,
@@ -199,12 +199,15 @@ export class mGraph extends Event {
             },
             data: {
                 ..._.cloneDeep(mGraph.defaultNodeData),
+                base:{
+                    name:"start"
+                },
                 type: "start"
             }
 
         })
         const r2 = graph.createNode({
-            shape: 'custom-rect',
+            shape: mGraph.NodeShape.CUSTOM_RECT,
             label: '过程',
             data: {
                 ..._.cloneDeep(mGraph.defaultNodeData),
@@ -218,14 +221,17 @@ export class mGraph extends Event {
                     ry: 20,
                 },
             },
-            label: '结束',
+            label: 'end',
             data: {
                 ..._.cloneDeep(mGraph.defaultNodeData),
+                base:{
+                    name:"end"
+                },
                 type: "end"
             }
         })
         const r4 = graph.createNode({
-            shape: 'custom-polygon',
+            shape: mGraph.NodeShape.CUSTOM_POLYGON,
             attrs: {
                 body: {
                     refPoints: '0,10 10,0 20,10 10,20',
@@ -249,10 +255,62 @@ export class mGraph extends Event {
         return this;
     }
 
+
+    // 画布节点是否正常
+
+    checkGraphValid() {
+       let ret = { sucess:false,errorMsg : ""}
+       let config = this.toJSON();
+       let { cells } = config;
+
+        let edges = cells.filter((c) => c.shape === "edge")
+        let nodes = cells.filter((c) => mGraph.NodeShape[c.shape])
+
+        console.log(`#####edges is `,edges,nodes);
+
+        let allEdgeNodes = edges.reduce((now,edge) => {
+            now.push(edge.source.port);
+            now.push(edge.target.port);
+            return now;
+        },[])
+
+        // 判断有没有节点没连线的
+        for (let i = 0; i < nodes.length;i++) {
+            let node = nodes[i];
+            let data = node.getData();
+            let { base } = data;
+            let  { name } = base;
+            if (!name) {
+                ret.errorMsg = `存在节点基本信息未填名称`
+                return;
+            }
+
+            if (!allEdgeNodes.includes(node.id)) {
+                ret.errorMsg = `存在节点未连线`
+                return;
+            }
+        }
+           
+    //         if (!allEdgeNodes.includes(node.id)) {
+    //             ret.errorMsg = `有存在未连线的节点`
+    //             return ret;
+    //         }
+    //     }
+
+        ret.sucess = true;
+        return ret;
+    
+    }
+
 }
 
 
 export namespace mGraph {
+
+    export const  NodeShape = {
+        'CUSTOM_RECT' : "custom-rect",
+        'CUSTOM_POLYGON' : "custom-polygon"
+    }
 
     export interface PortMeta extends PortManager.PortMetadata {
         data: {

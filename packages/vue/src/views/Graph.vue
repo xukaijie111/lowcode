@@ -7,7 +7,7 @@ import x6EditorVue from '../components/x6-editor.vue';
 import x6GraphInfoVue from '../components/x6-graph-info.vue'
 import _ from 'lodash'
 import { useRoute } from 'vue-router'
-import { createProcess , getProcessDetail , saveDsl } from '../common/api'
+import { createProcess, getProcessDetail, saveDsl,deployDsl } from '../common/api'
 import { ElMessage } from 'element-plus';
 
 
@@ -25,10 +25,10 @@ let data = ref({
 })
 let id = ref();
 
-const onConfirmProcessBasicInfo = async (_data:unknown) => {
-     //@ts-ignore
+const onConfirmProcessBasicInfo = async (_data: unknown) => {
+    //@ts-ignore
     data.value = _.cloneDeep(_data);
-    await saveDsl(id.value,{ basic : data.value});
+    await saveDsl(id.value, { basic: data.value });
     ElMessage.success(`保存成功`)
 }
 
@@ -45,11 +45,11 @@ const createGraph = async (options = {}) => {
 
 }
 
-const onConfirmDialog = async (_data:unknown) => {
-   
+const onConfirmDialog = async (_data: unknown) => {
+
     //@ts-ignore
     data.value = _.cloneDeep(_data);
-   
+
     await create();
     showModal.value = false;
     editUrl();
@@ -61,17 +61,17 @@ const onConfirmDialog = async (_data:unknown) => {
 }
 
 const create = async () => {
-    let _id = await createProcess({basic:data.value});
+    let _id = await createProcess({ basic: data.value });
     id.value = _id;
 }
 
 const _getProcessDetail = async () => {
-        let res = await getProcessDetail(id.value);
-        //@ts-ignore
-        let { basic ,config} = res;
-        data.value = basic;
-        mgraph.value?.fromJSON(config);
-        mgraph.value?.setData(basic)
+    let res = await getProcessDetail(id.value);
+    //@ts-ignore
+    let { basic, config } = res;
+    data.value = basic;
+    mgraph.value?.fromJSON(config);
+    mgraph.value?.setData(basic)
 
 }
 
@@ -100,21 +100,36 @@ onMounted(() => {
 
 
 const onSaveDsl = async () => {
-   let body = {
+    let body = {
         basic: {
             ...data.value
         },
-        config:mgraph.value?.toJson()
-   }
+        config: mgraph.value?.toJSON()
+    }
 
-   await saveDsl(id.value,body)
+    await saveDsl(id.value, body)
 
     ElMessage.success(`保存成功`)
 
 }
 
-const onDeployDsl = () => {
+const onDeployDsl = async () => {
+    let ret = mgraph.value?.checkGraphValid();
 
+    if (!ret?.sucess) {
+        return ElMessage.warning(`${ret?.errorMsg}`);
+    }
+
+     let body = {
+        basic: {
+            ...data.value
+        },
+        config: mgraph.value?.toJSON()
+    }
+
+    await deployDsl(id.value, body)
+
+    ElMessage.success(`部署成功`)
 }
 
 
@@ -135,7 +150,7 @@ const onDeployDsl = () => {
 
 
             <div class="base-info">
-                <x6GraphInfoVue :data="data" @confirm="onConfirmProcessBasicInfo"/>
+                <x6GraphInfoVue :data="data" @confirm="onConfirmProcessBasicInfo" />
             </div>
 
             <div class="x6-main">
@@ -146,7 +161,7 @@ const onDeployDsl = () => {
                 </div>
                 <div class="graph-wrap">
                     <div class="graph-operates">
-                         <el-button type="primary" @click="onSaveDsl">保存</el-button>
+                        <el-button type="primary" @click="onSaveDsl">保存</el-button>
                         <el-button type="primary" @click="onDeployDsl">部署</el-button>
                     </div>
                     <x6MainVue ref="main" />
@@ -195,7 +210,7 @@ const onDeployDsl = () => {
         flex: 1;
         position: relative;
 
-        .graph-operates{
+        .graph-operates {
             position: absolute;
             top: 30px;
             right: 30px;

@@ -66,3 +66,15 @@ export const saveDsl = (id,config) => {
         }
       }) 
 }
+
+
+export const deployDsl = (id,config) => {
+  return apiRequest({
+    url:'/process/deploy',
+    method:'POST',
+    data : {
+        id,
+        ...config,
+    }
+  }) 
+}

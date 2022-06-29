@@ -54,10 +54,21 @@ const nodeValidCheck = async () => {
 const onConfirmClick = async () => {
     try {
         await nodeValidCheck();
+        let { base } = nodeData.value;
+        let { name } = base;
+        if (name) {
+            console.log(`设置name ${name}`)
+            currentNode.value?.attr({
+            label:{
+                text:name
+            }
+        })
+        }
+      
         currentNode.value?.setData(_.cloneDeep(nodeData.value))
         ElMessage.success(`保存成功`)
     } catch (error) {
-        
+        console.log(error);
     }
 
 }

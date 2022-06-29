@@ -63,9 +63,18 @@ export  class ProcessController extends Controller {
 
     private deployDsl = async (request:Request,response:IResponse,next:NextFunction) => {
 
+        let { config } = request.body;
 
-
+        this.destructDslMetaData(config);
+        await super.edit(request.body);
+        
         return response.ok(null);
+    }
+
+
+    // 精简元数据
+    private destructDslMetaData(config) {
+
     }
 
 
