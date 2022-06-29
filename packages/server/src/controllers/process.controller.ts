@@ -4,16 +4,24 @@ import { Mongodb } from '../mongo/index'
 import { IResponse } from '../app'
 import * as _ from 'lodash'
 import { Controller } from './base.controller';
-import { NodeShape } from '@lowcode/shared'
+import { 
+    NodeShape ,
+    NodeType,
+    CheckNodeMetaData,
+    StartNodeMetaData,
+    EndNodeMetaData,
+    CommonNodeMetaData,
+    NodeMetaData
+} from '@lowcode/shared'
 import * as path from 'path';
 
-export  class ProcessController extends Controller {
+export class ProcessController extends Controller {
     public path = "/process";
-    public router:Router = Router();
+    public router: Router = Router();
 
     constructor({
         mongodb
-    }:ProcessController.options) {
+    }: ProcessController.options) {
         super();
         this.collect = mongodb.getCollection('process');
         this.initializeRoutes();
@@ -27,12 +35,12 @@ export  class ProcessController extends Controller {
         this.router.post(`${this.path}/deploy`, this.deployDsl);
     }
 
-    private  getProcessList = async (request:Request,response:IResponse,next:NextFunction) => {
-        let res = await super.get(request.body,['name']);
+    private getProcessList = async (request: Request, response: IResponse, next: NextFunction) => {
+        let res = await super.get(request.body, ['name']);
         return response.ok(res)
     }
 
-    processEdit = async (request:Request,response:IResponse,next:NextFunction) => {
+    processEdit = async (request: Request, response: IResponse, next: NextFunction) => {
         let { body } = request;
         // 新增检查名称有重复的没有
         if (!body.id) {
@@ -48,37 +56,106 @@ export  class ProcessController extends Controller {
 
     }
 
-    private getDetail = async (request:Request,response:IResponse,next:NextFunction) => {
+    private getDetail = async (request: Request, response: IResponse, next: NextFunction) => {
 
         let detail = await super.detail(request.body);
-    
+
         return response.ok(detail)
     }
 
-    private processDelete = async (request:Request,response:IResponse,next:NextFunction) => {
+    private processDelete = async (request: Request, response: IResponse, next: NextFunction) => {
 
         await super.delete(request.body)
         return response.ok(null);
     }
 
 
-    private deployDsl = async (request:Request,response:IResponse,next:NextFunction) => {
+    private deployDsl = async (request: Request, response: IResponse, next: NextFunction) => {
 
         let { config } = request.body;
 
         this.destructDslMetaData(config);
         await super.edit(request.body);
-        
+
         return response.ok(null);
     }
 
 
     // 精简元数据
     private destructDslMetaData(config) {
-        // let 
-        // let { cells } = config;
-        // let edges = cells.filter((c) => c.shape === "edge")
-        // let nodes = cells.filter((c) => )
+
+        let cache = {};
+        let { cells } = config;
+        let edges = cells.filter((c) => c.shape === "edge")
+        let nodes = cells.filter((c) =>{
+            let values = Object.values(c);
+           return values.includes(c.shape);
+        })
+        let startNode = _.find(nodes, (node) => node.data.type === "start")
+
+        function getNextNode(node,portId) {
+            let query = { cell :node.id ,port:portId};
+            
+            let next = _.find(nodes, query)
+            return next;  
+        }
+
+        function generateNodeDsl(node):NodeMetaData {
+
+            if (cache[node.id]) return cache[node.id]
+            let { data : { base ,type}} = node;
+            let ret:NodeMetaData = {
+                name:base.name,
+                description:base.description,
+                type,
+                next:null
+            }
+
+            if (type === NodeType.CHECK) {
+                (ret as CheckNodeMetaData).elseNext = null;
+            }
+
+            cache[node.id] = ret;
+
+            return ret;
+        }
+
+        let currentNode = startNode;
+        let meta = generateNodeDsl(currentNode);
+       
+        function deepMetaData(currentNode,meta) {
+            if (cache[currentNode.id]) return;
+            let { data } = currentNode;
+            if (data.type === NodeType.END) return;
+            let { ports : { items }} = currentNode;
+            let rightPortId = _.find(items,{ group:'right'});
+            if (rightPortId) {
+                let targetNode = getNextNode(currentNode,rightPortId);
+                if (targetNode) {
+                    meta.next = generateNodeDsl(targetNode);
+                    deepMetaData(targetNode,meta.next)
+                }
+            }
+
+            if (data.type === NodeType.CHECK){
+                let downPortId = _.find(items,{ group:'down'});
+            if (downPortId) {
+                let targetNode = getNextNode(currentNode,downPortId);
+                if (targetNode) {
+                    meta.next = generateNodeDsl(targetNode);
+                    deepMetaData(targetNode,meta.next)
+                }
+            }
+            }
+        }
+
+        deepMetaData(currentNode,meta);
+
+        console.log(`###meta is `,meta);
+        return {
+            meta
+        }
+
     }
 
 
@@ -88,6 +165,6 @@ export  class ProcessController extends Controller {
 
 export namespace ProcessController {
     export type options = {
-        mongodb:Mongodb
+        mongodb: Mongodb
     }
 }

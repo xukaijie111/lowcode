@@ -1,6 +1,6 @@
 import { Graph, Shape, Addon, Node, Edge } from '@antv/x6'
 import { PortManager } from '@antv/x6/lib/model/port'
-import { NodeShape } from '@lowcode/shared'
+import { NodeShape,NodeType } from '@lowcode/shared'
 import _ from 'lodash'
 import {
     Event
@@ -263,29 +263,46 @@ export class mGraph extends Event {
        let config = this.toJSON();
        let { cells } = config;
 
+      
         let edges = cells.filter((c) => c.shape === "edge")
-        let nodes = cells.filter((c) => NodeShape[c.shape])
+        let nodes = cells.filter((c) =>{
+            let values = Object.values(NodeShape);
+           return values.includes(c.shape);
+        })
+
+        let startNode = _.find(nodes,(node) => node.data.type === NodeType.START)
 
         let allEdgeNodes = edges.reduce((now,edge) => {
-            now.push(edge.source.port);
-            now.push(edge.target.port);
+            now.push(edge.source.cell);
+            now.push(edge.target.cell);
             return now;
         },[])
+
+        if (nodes.length === 1) {
+            ret.errorMsg = `节点数量不足`
+            return ret;
+        }
+
+        if (!startNode) {
+            ret.errorMsg = `请加入开始节点`
+            return ret;
+        }
+        
 
         // 判断有没有节点没连线的
         for (let i = 0; i < nodes.length;i++) {
             let node = nodes[i];
-            let data = node.getData();
+            let { data } = node;
             let { base } = data;
             let  { name } = base;
             if (!name) {
                 ret.errorMsg = `存在节点基本信息未填名称`
-                return;
+                return ret;
             }
 
             if (!allEdgeNodes.includes(node.id)) {
                 ret.errorMsg = `存在节点未连线`
-                return;
+                return ret;
             }
         }
            
