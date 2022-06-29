@@ -1,0 +1,26 @@
+{
+    "ts-node":{
+        "module":"commonjs",
+        "target":"es2015",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "esm":true,
+        "skipLibCheck": true
+    },
+
+    "compilerOptions": {
+      "baseUrl": ".",
+      "paths": {
+        "@lowcode/*": ["../*/src/"],
+      }
+    },
+
+      "include": [
+        "src/**/*.ts"
+      ],
+      "exclude": [
+        "node_modules"
+      ]
+
+
+}

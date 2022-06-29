@@ -5,11 +5,10 @@
   "main": "index.js",
   "scripts": {
     "preinstall": "node ./scripts/preinstall.js",
-    "postinstall": "cnpm --prefix ./server install",
     "dev:vue": "npm --prefix ./packages/vue run dev",
-    "dev:server": "npm --prefix ./server run start",
+    "dev:server": "npm --prefix ./packages/server run start",
     "dev:editor":"node ./scripts/dev editor",
-    "clean": "node ./scripts/clean.js"
+    "clean": "sudo node ./scripts/clean.js"
   },
   "repository": {
     "type": "git",

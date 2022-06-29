@@ -75,10 +75,10 @@ export  class ProcessController extends Controller {
 
     // 精简元数据
     private destructDslMetaData(config) {
-        let 
-        let { cells } = config;
-        let edges = cells.filter((c) => c.shape === "edge")
-        let nodes = cells.filter((c) => )
+        // let 
+        // let { cells } = config;
+        // let edges = cells.filter((c) => c.shape === "edge")
+        // let nodes = cells.filter((c) => )
     }
 
 
