@@ -1,11 +1,10 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import { Collection } from 'mongodb';
 import { Mongodb } from '../mongo/index'
 import { IResponse } from '../app'
 import * as _ from 'lodash'
 import { Controller } from './base.controller';
-import { 
-    NodeShape ,
+import {
+    NodeShape,
     NodeType,
     CheckNodeMetaData,
     StartNodeMetaData,
@@ -13,7 +12,8 @@ import {
     CommonNodeMetaData,
     NodeMetaData
 } from '@lowcode/shared'
-import * as path from 'path';
+
+import { parseDependency, checkCodeInValid } from '../common/util'
 
 export class ProcessController extends Controller {
     public path = "/process";
@@ -74,10 +74,43 @@ export class ProcessController extends Controller {
 
         let { config } = request.body;
 
+        let nodes = this.getNodes(config.cells);
+        for (let i = 0; i < nodes.length; i++) {
+            let node = nodes[i];
+            let { data: { code: source, base: { name } } } = node;
+            let ret = checkCodeInValid(source)
+            if (ret) {
+                return response.fail(`节点${name} 代码错误 ${ret}`)
+            }
+        }
+
+
         this.destructDslMetaData(config);
+        this.codeGen(config);
         await super.edit(request.body);
 
         return response.ok(null);
+    }
+
+
+    private codeGen(config) {
+        let { cells } = config;
+        let nodes = this.getNodes(cells)
+        let deps = new Set();
+        for (let i = 0; i < nodes.length; i++) {
+            let node = nodes[i];
+            let { data: { code: source } } = node;
+            parseDependency(source);
+        }
+
+    }
+
+    private getNodes(cells) {
+
+        return cells.filter((c) => {
+            let values = Object.values(NodeShape);
+            return values.includes(c.shape);
+        })
     }
 
 
@@ -87,32 +120,29 @@ export class ProcessController extends Controller {
         let cache = {};
         let { cells } = config;
         let edges = cells.filter((c) => c.shape === "edge")
-        let nodes = cells.filter((c) =>{
-            let values = Object.values(NodeShape);
-           return values.includes(c.shape);
-        })
+        let nodes = this.getNodes(cells);
         let startNode = _.find(nodes, (node) => node.data.type === "start")
 
-        function getNextNode(node,portId) {
-            let query = { cell :node.id ,port:portId};
-            let edge = _.find(edges, {source:query})
+        function getNextNode(node, portId) {
+            let query = { cell: node.id, port: portId };
+            let edge = _.find(edges, { source: query })
             if (!edge) return;
             let { target } = edge;
             let { cell } = target;
 
-            let n = _.find(nodes,{ id: cell })
+            let n = _.find(nodes, { id: cell })
             return n;
         }
 
-        function generateNodeDsl(node):NodeMetaData {
+        function generateNodeDsl(node): NodeMetaData {
 
             if (cache[node.id]) return cache[node.id]
-            let { data : { base ,type}} = node;
-            let ret:NodeMetaData = {
-                name:base.name,
-                description:base.description,
+            let { data: { base, type } } = node;
+            let ret: NodeMetaData = {
+                name: base.name,
+                description: base.description,
                 type,
-                next:null
+                next: null
             }
 
             if (type === NodeType.CHECK) {
@@ -123,37 +153,37 @@ export class ProcessController extends Controller {
 
         let currentNode = startNode;
         let meta = generateNodeDsl(currentNode);
-       
-        function deepMetaData(currentNode,meta) {
+
+        function deepMetaData(currentNode, meta) {
             if (cache[currentNode.id]) return;
             cache[currentNode.id] = meta;
             let { data } = currentNode;
             if (data.type === NodeType.END) return;
-            let { ports : { items }} = currentNode;
-            let rightPort = _.find(items,{ group:'right'});
+            let { ports: { items } } = currentNode;
+            let rightPort = _.find(items, { group: 'right' });
             if (rightPort) {
-                let targetNode = getNextNode(currentNode,rightPort.id);
+                let targetNode = getNextNode(currentNode, rightPort.id);
                 if (targetNode) {
                     meta.next = generateNodeDsl(targetNode);
-                    deepMetaData(targetNode,meta.next)
+                    deepMetaData(targetNode, meta.next)
                 }
             }
 
-            if (data.type === NodeType.CHECK){
-                let downPort = _.find(items,{ group:'down'});
-            if (downPort) {
-                let targetNode = getNextNode(currentNode,downPort.id);
-                if (targetNode) {
-                    meta.next = generateNodeDsl(targetNode);
-                    deepMetaData(targetNode,meta.next)
+            if (data.type === NodeType.CHECK) {
+                let downPort = _.find(items, { group: 'down' });
+                if (downPort) {
+                    let targetNode = getNextNode(currentNode, downPort.id);
+                    if (targetNode) {
+                        meta.next = generateNodeDsl(targetNode);
+                        deepMetaData(targetNode, meta.next)
+                    }
                 }
-            }
             }
         }
 
-        deepMetaData(currentNode,meta);
+        deepMetaData(currentNode, meta);
 
-        console.log(`###meta is `,meta);
+        console.log(`###meta is `, meta);
         return {
             meta
         }

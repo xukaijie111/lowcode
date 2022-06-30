@@ -14,12 +14,12 @@ import { ElMessageBox } from 'element-plus'
 import _ from 'lodash';
 
 type MapValue = {
-    node:Node,
+    node: Node,
     dirty: boolean,
     source: string
 }
 
-const mapCache = ref(new Map<string, MapValue>());
+let mapCache = ref(new Map<string, MapValue>());
 
 let props = defineProps<
     {
@@ -38,7 +38,7 @@ let nodes: Array<Node> = []
 
 // 重置cache
 const resetCache = (id?: string) => {
-    mapCache.value.clear();
+   
     let nodes = props.mgraph.getGraph().getNodes();
     if (id) {
         let node = _.find(nodes, { id })
@@ -50,19 +50,26 @@ const resetCache = (id?: string) => {
             })
         }
         return;
-    }
-    nodes.forEach((node) => {
-        let _id = node.id;
-        mapCache.value.set(_id, {
-            dirty: false,
-            source: node.getData().code.source,
-            node
+    }else {
+         mapCache.value.clear();
+        nodes.forEach((node) => {
+            let _id = node.id;
+
+            console.log(`获取节点代码为`,node.getData().code.source)
+            mapCache.value.set(_id, {
+                dirty: false,
+                source: node.getData().code.source,
+                node
+            })
         })
-    })
+
+        console.log(`###mapcache is `,_.cloneDeep(mapCache.value));
+    }
+   
 
 }
 
-const getCacheCode = (node:Node) => {
+const getCacheCode = (node: Node) => {
     let id = node.id;
     let data = mapCache.value.get(id);
     if (data) return data.source
@@ -79,15 +86,14 @@ const checkCurrentHasChange = () => {
     let doc = mainRef.value.getCurrentCM();
     let map = mapCache.value.get(id);
     if (map) {
-        let { source} = map
-        console.log(`###source is `,source,doc)
+        let { source } = map
         if (source !== doc) return true;
     }
     return false;
 }
 
 const checkCacheHasChange = () => {
-    for (let [,value] of mapCache.value) {
+    for (let [, value] of mapCache.value) {
         if (value.dirty) return true;
     }
     return false;
@@ -110,22 +116,28 @@ const flushToMap = () => {
 // 手动保存的时候，flush到Node
 const flushToNode = (id?: string | Array<string>) => {
 
+    if (!id) {
+        id = props.mgraph.getGraph().getNodes().map((n) => n.id)
+    }
+
     if (Array.isArray(id)) {
         id.forEach((i) => flushToNode(i));
         return;
     }
 
-    id = id || currentNode.value?.id as string;
-    let doc = mainRef.value.getCurrentCM();
-    let map = mapCache.value.get(id);
-    if (map) {
-        let node = getNodeById(id) as Node;
-        let data = node.getData();
-        data.source = doc;
-        node.setData(data);
-        map.dirty = false;
-        map.source = doc;
-    }
+
+    let map = mapCache.value.get(id) as MapValue;
+
+    // 当前的节点，则从CM取，其他的从cache里取
+    let doc = id === currentNode.value.id ? mainRef.value.getCurrentCM() : map?.source;
+
+    let node = getNodeById(id) as Node;
+    let data = node.getData();
+    data.code.source = doc;
+    node.setData(data);
+    map.dirty = false;
+    map.source = doc;
+
 }
 
 const setCurrentNode = (node: Node | null) => {
@@ -147,7 +159,8 @@ const openEditor = (node: Node) => {
     nextTick(() => {
         sideBarRef.value.update();
         tabBarRef.value.update();
-        onClickSideBarItem(node);
+        setCurrentNode(node);
+        tabBarRef.value.addNode(node);
     })
 }
 
@@ -160,25 +173,25 @@ const onClickSideBarItem = (node: Node) => {
 const saveConfirm = async () => {
     let ret
     try {
-            ret = await ElMessageBox.confirm(
-                '是否保存修改',
-                '提示',
-                {
-                    distinguishCancelAndClose: true,
-                    confirmButtonText: '保存',
-                    cancelButtonText: '不保存',
-                    type: 'warning',
-                }
+        ret = await ElMessageBox.confirm(
+            '是否保存修改',
+            '提示',
+            {
+                distinguishCancelAndClose: true,
+                confirmButtonText: '保存',
+                cancelButtonText: '不保存',
+                type: 'warning',
+            }
 
-            )
+        )
 
-            flushToNode();
-           
-        } catch (err) {
-         return err
-        }
+        flushToNode();
 
-        return ret;
+    } catch (err) {
+        return err
+    }
+
+    return ret;
 }
 
 
@@ -189,7 +202,7 @@ const closeCurrentTab = async () => {
         if (ret === "close") return;
         if (ret === "cancel") resetCache(currentNode.value.id);
         if (ret === "confirm") flushToNode(currentNode.value.id);
-       
+
     }
 
     let preNodeId = currentNode.value.id;
@@ -205,19 +218,19 @@ const onClickTab = (node: Node) => {
 
 const onCloseClick = async () => {
 
-    if (checkCacheHasChange() || checkCacheHasChange()) {
+    if (checkCacheHasChange() || checkCurrentHasChange()) {
         let ret = await saveConfirm();
         if (ret === "close") return;
         if (ret === "cancel") resetCache();
         if (ret === "confirm") flushToNode();
     }
 
-dialogVisible.value = false;
+    dialogVisible.value = false;
 
 }
 
 const saveCurrentCM = () => {
-    flushToNode();
+    flushToNode(currentNode.value.id);
 }
 
 
@@ -230,7 +243,10 @@ defineExpose({
 
 <template>
     <div class="editor-wrap">
-        <el-dialog v-model="dialogVisible" width="80%" top="5vh">
+        <el-dialog 
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        v-model="dialogVisible" width="80%" top="5vh" >
 
             <div slot="header" class="header flex-center relative">
                 {{ mgraph.getName() }}
@@ -242,10 +258,8 @@ defineExpose({
                 <CodeEditorSideBarVue :activeId="activeId" @click-item="onClickSideBarItem" ref="sideBarRef"
                     :mgraph="props.mgraph" />
                 <div class="code-wrap h-full">
-                    <CodeEditorTabBarVue 
-                    :map="mapCache"
-                    @click="onClickTab" @close="closeCurrentTab" :activeId="activeId"
-                        :mgraph="props.mgraph" ref="tabBarRef" />
+                    <CodeEditorTabBarVue :map="mapCache" @click="onClickTab" @close="closeCurrentTab"
+                        :activeId="activeId" :mgraph="props.mgraph" ref="tabBarRef" />
 
                     <CodeEditorMainVue @save="saveCurrentCM" ref="mainRef" :node="currentNode" />
                 </div>

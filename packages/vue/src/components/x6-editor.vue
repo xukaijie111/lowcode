@@ -11,11 +11,15 @@ import { ElMessage } from 'element-plus'
 import { nodeRule } from '../common/rule'
 import _ from 'lodash'
 
-    let props = defineProps<
-        {
-            mgraph:mGraph
-        }
-    >()
+let props = defineProps<
+    {
+        mgraph: mGraph
+    }
+>()
+
+const emits = defineEmits<{
+    (e:"save"):void
+}>()
 
 let drawerVisible = ref(false)
 
@@ -41,24 +45,25 @@ const handleClickTab = (tab: TabsPaneContext, event: Event) => {
 }
 
 const nodeValidCheck = async () => {
-    try{
+    try {
         let nodes = props.mgraph.getGraph().getNodes();
-         let { base } = nodeData.value;
+        let { base } = nodeData.value;
         let { name } = base;
 
-        let names = nodes.map((n) => n.getData().base.name)
+        let names = nodes.filter((n) => n.id !== currentNode.value?.id).map((n) => n.getData().base.name)
 
         if (names.includes(name)) {
-             ElMessage.warning(`名称${name} 重复了`)
-             return Promise.reject();
+            ElMessage.warning(`名称${name} 重复了`)
+            return Promise.reject();
         }
         await baseRef.value.validate();
 
-    }catch(err) {
+    } catch (err) {
         ElMessage.warning(`基本信息內容有误`)
+        console.log(err)
         return Promise.reject();
     }
-   
+
 }
 
 const onConfirmClick = async () => {
@@ -69,14 +74,16 @@ const onConfirmClick = async () => {
         if (name) {
             console.log(`设置name ${name}`)
             currentNode.value?.attr({
-            label:{
-                text:name
-            }
-        })
+                label: {
+                    text: name
+                }
+            })
         }
-      
-        currentNode.value?.setData(_.cloneDeep(nodeData.value))
-        ElMessage.success(`保存成功`)
+
+        currentNode.value?.setData(_.cloneDeep(nodeData.value));
+
+        emits('save')
+        
     } catch (error) {
         console.log(error);
     }
@@ -103,7 +110,7 @@ defineExpose({
 
     <div class="editor-wrap">
 
-        <codeEditorVue ref="codeEditorRef" :mgraph = "props.mgraph"/>
+        <codeEditorVue ref="codeEditorRef" :mgraph="props.mgraph" />
 
         <el-drawer v-model="drawerVisible" title="编辑节点" direction="rtl" size="50%">
             <div class="draw-wrap w-full h-full">
@@ -116,32 +123,30 @@ defineExpose({
 
 
                     <div class="draw-content w-full">
-                        <div v-if="activeName === 'base'" class="w-full">
-                            <el-form :model="nodeData.base" 
-                            label-position="left"
-                            ref="baseRef"
-                            label-width="60px" :rules="nodeRule" class="w-full">
+                        <div v-show="activeName === 'base'" class="w-full">
+                            <el-form :model="nodeData.base" label-position="left" ref="baseRef" label-width="60px"
+                                :rules="nodeRule" class="w-full">
                                 <el-form-item label="名称" prop="name">
-                                    <el-input v-model="nodeData.base.name" placeholder="只支持英文"/>
+                                    <el-input v-model="nodeData.base.name" placeholder="只支持英文" />
                                 </el-form-item>
                                 <el-form-item label="描述" prop="description">
-                                     <el-input v-model="nodeData.base.description" />
+                                    <el-input v-model="nodeData.base.description" />
                                 </el-form-item>
-                               
+
                             </el-form>
                         </div>
 
-                        <div v-if="activeName === 'code'" >
-                             <el-radio-group v-model="nodeData.code.mode" class="w-full">
+                        <div v-show="activeName === 'code'">
+                            <el-radio-group v-model="nodeData.code.mode" class="w-full">
                                 <el-radio label="self">自定义实现</el-radio>
                                 <el-radio label="imoort">引入其他流</el-radio>
                             </el-radio-group>
-                            <div v-if="nodeData.code.mode === 'self' ">
-                                    <el-button type="primary" @click="onEditCodeClick">编辑</el-button>
+                            <div v-if="nodeData.code.mode === 'self'">
+                                <el-button type="primary" @click="onEditCodeClick">编辑</el-button>
                             </div>
 
-                            <div v-if="nodeData.code.mode === 'imoort' ">
-                                    <el-button type="primary">选择</el-button>
+                            <div v-if="nodeData.code.mode === 'imoort'">
+                                <el-button type="primary">选择</el-button>
                             </div>
                         </div>
 
@@ -149,7 +154,7 @@ defineExpose({
                     </div>
                 </div>
 
-                <el-button type="primary" @click="onConfirmClick">确定</el-button>
+                <el-button type="primary" @click="onConfirmClick">保存</el-button>
             </div>
 
         </el-drawer>
@@ -174,7 +179,7 @@ defineExpose({
         .draw-content {
             flex: 1;
             height: 0px;
-            
+
         }
     }
 

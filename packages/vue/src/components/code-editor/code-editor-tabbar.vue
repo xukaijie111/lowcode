@@ -211,7 +211,7 @@ watch(
 
     .active-tab {
     background-color: #1e1e1e;
-    color: #f2f2f2;
+    color: #ffffff;
     }
   }
 

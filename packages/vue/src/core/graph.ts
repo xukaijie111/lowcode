@@ -565,7 +565,7 @@ export namespace mGraph {
 
         },
         code: {
-            source: ""
+            source: "export default async function(pipe){}"
         },
         detail: {
 
