@@ -1,5 +1,5 @@
 {
-  "name": "manondo",
+  "name": "lowcode",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xukaijie111/ManonDo.git"
+    "url": "git+https://github.com/xukaijie111/lowcode.git"
   },
   "keywords": [
     "lowcode",
@@ -26,9 +26,9 @@
   "author": "bajie",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/xukaijie111/ManonDo/issues"
+    "url": "https://github.com/xukaijie111/lowcode/issues"
   },
-  "homepage": "https://github.com/xukaijie111/ManonDo#readme",
+  "homepage": "https://github.com/xukaijie111/lowcode#readme",
   "engines": {
     "node": ">=16.5.0"
   },

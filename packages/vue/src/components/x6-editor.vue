@@ -42,6 +42,16 @@ const handleClickTab = (tab: TabsPaneContext, event: Event) => {
 
 const nodeValidCheck = async () => {
     try{
+        let nodes = props.mgraph.getGraph().getNodes();
+         let { base } = nodeData.value;
+        let { name } = base;
+
+        let names = nodes.map((n) => n.getData().base.name)
+
+        if (names.includes(name)) {
+             ElMessage.warning(`名称${name} 重复了`)
+             return Promise.reject();
+        }
         await baseRef.value.validate();
 
     }catch(err) {

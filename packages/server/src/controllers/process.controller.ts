@@ -88,16 +88,20 @@ export class ProcessController extends Controller {
         let { cells } = config;
         let edges = cells.filter((c) => c.shape === "edge")
         let nodes = cells.filter((c) =>{
-            let values = Object.values(c);
+            let values = Object.values(NodeShape);
            return values.includes(c.shape);
         })
         let startNode = _.find(nodes, (node) => node.data.type === "start")
 
         function getNextNode(node,portId) {
             let query = { cell :node.id ,port:portId};
-            
-            let next = _.find(nodes, query)
-            return next;  
+            let edge = _.find(edges, {source:query})
+            if (!edge) return;
+            let { target } = edge;
+            let { cell } = target;
+
+            let n = _.find(nodes,{ id: cell })
+            return n;
         }
 
         function generateNodeDsl(node):NodeMetaData {
@@ -114,9 +118,6 @@ export class ProcessController extends Controller {
             if (type === NodeType.CHECK) {
                 (ret as CheckNodeMetaData).elseNext = null;
             }
-
-            cache[node.id] = ret;
-
             return ret;
         }
 
@@ -125,12 +126,13 @@ export class ProcessController extends Controller {
        
         function deepMetaData(currentNode,meta) {
             if (cache[currentNode.id]) return;
+            cache[currentNode.id] = meta;
             let { data } = currentNode;
             if (data.type === NodeType.END) return;
             let { ports : { items }} = currentNode;
-            let rightPortId = _.find(items,{ group:'right'});
-            if (rightPortId) {
-                let targetNode = getNextNode(currentNode,rightPortId);
+            let rightPort = _.find(items,{ group:'right'});
+            if (rightPort) {
+                let targetNode = getNextNode(currentNode,rightPort.id);
                 if (targetNode) {
                     meta.next = generateNodeDsl(targetNode);
                     deepMetaData(targetNode,meta.next)
@@ -138,9 +140,9 @@ export class ProcessController extends Controller {
             }
 
             if (data.type === NodeType.CHECK){
-                let downPortId = _.find(items,{ group:'down'});
-            if (downPortId) {
-                let targetNode = getNextNode(currentNode,downPortId);
+                let downPort = _.find(items,{ group:'down'});
+            if (downPort) {
+                let targetNode = getNextNode(currentNode,downPort.id);
                 if (targetNode) {
                     meta.next = generateNodeDsl(targetNode);
                     deepMetaData(targetNode,meta.next)
