@@ -1,174 +1,127 @@
 
 <script lang="ts" setup>
 
-import { ref, nextTick } from 'vue'
-import type { Node } from '@antv/x6'
-import { mGraph } from '../../core/graph';
+import { nextTick, ref, watch } from 'vue'
+
 import CodeEditorSideBarVue from './code-editor-sidebar.vue'
 import CodeEditorTabBarVue from './code-editor-tabbar.vue'
 import CodeEditorMainVue from './code-editor-main.vue';
-import { Close } from '@element-plus/icons-vue'
-import { ElMessageBox } from 'element-plus'
 
+import { ElMessageBox } from 'element-plus'
+import type {
+    ListItem
+} from './type'
 
 import _ from 'lodash';
 
-type MapValue = {
-    node: Node,
+
+const props = defineProps<{
+    lists: Array<ListItem>,
+    name?: string
+}>()
+
+const emits = defineEmits<{
+    (e: 'save', data: Array<Record<any, any>>): void
+}>()
+
+interface MapValue {
     dirty: boolean,
     source: string
 }
 
 let mapCache = ref(new Map<string, MapValue>());
 
-let props = defineProps<
-    {
-        mgraph: mGraph
-    }
->()
-
 let dialogVisible = ref(false)
 let sideBarRef = ref();
 let tabBarRef = ref();
 let mainRef = ref();
-let currentNode = ref();
 let activeId = ref();
-let nodes: Array<Node> = []
+
+watch(() => activeId.value, (newValue) => {
+
+    if (!newValue) {
+        mainRef.value.update("")
+        return ;
+    }
+    // tab栏切换
+    tabBarRef.value.addItem(newValue);
+
+    // 
+    let doc = mapCache.value.get(newValue)?.source
+    mainRef.value.update(doc)
+})
+
 
 
 // 重置cache
 const resetCache = (id?: string) => {
-   
-    let nodes = props.mgraph.getGraph().getNodes();
     if (id) {
-        let node = _.find(nodes, { id })
-        if (node) {
+        let item = _.find(props.lists, { id })
+        if (item) {
             mapCache.value.set(id, {
                 dirty: false,
-                source: node.getData().code.source,
-                node,
+                source: item.source
             })
         }
         return;
-    }else {
-         mapCache.value.clear();
-        nodes.forEach((node) => {
-            let _id = node.id;
-
-            console.log(`获取节点代码为`,node.getData().code.source)
+    } else {
+        mapCache.value.clear();
+        props.lists.forEach((item) => {
+            let _id = item.id;
             mapCache.value.set(_id, {
                 dirty: false,
-                source: node.getData().code.source,
-                node
+                source: item.source
             })
         })
-
-        console.log(`###mapcache is `,_.cloneDeep(mapCache.value));
-    }
-   
-
-}
-
-const getCacheCode = (node: Node) => {
-    let id = node.id;
-    let data = mapCache.value.get(id);
-    if (data) return data.source
-}
-
-const getNodeById = (id: string) => {
-
-    let node = _.find(nodes, { id });
-    return node;
-}
-
-const checkCurrentHasChange = () => {
-    let id = currentNode.value?.id as string;
-    let doc = mainRef.value.getCurrentCM();
-    let map = mapCache.value.get(id);
-    if (map) {
-        let { source } = map
-        if (source !== doc) return true;
-    }
-    return false;
-}
-
-const checkCacheHasChange = () => {
-    for (let [, value] of mapCache.value) {
-        if (value.dirty) return true;
-    }
-    return false;
-}
-
-// 切换tab的时候，保存临时写的代码
-const flushToMap = () => {
-    let id = currentNode.value?.id as string;
-    let map = mapCache.value.get(id);
-    if (map) {
-        let doc = mainRef.value.getCurrentCM();
-        let source = map.source;
-        if (doc !== source) {
-            map.dirty = true;
-            map.source = doc;
-        }
     }
 }
 
-// 手动保存的时候，flush到Node
+
+// 手动保存的时候，flush到业务
 const flushToNode = (id?: string | Array<string>) => {
 
     if (!id) {
-        id = props.mgraph.getGraph().getNodes().map((n) => n.id)
+        id = props.lists.map((n) => n.id)
     }
 
-    if (Array.isArray(id)) {
-        id.forEach((i) => flushToNode(i));
-        return;
+    if (!Array.isArray(id)) {
+
+        id = [id];
     }
 
-
-    let map = mapCache.value.get(id) as MapValue;
-
-    // 当前的节点，则从CM取，其他的从cache里取
-    let doc = id === currentNode.value.id ? mainRef.value.getCurrentCM() : map?.source;
-
-    let node = getNodeById(id) as Node;
-    let data = node.getData();
-    data.code.source = doc;
-    node.setData(data);
-    map.dirty = false;
-    map.source = doc;
-
-}
-
-const setCurrentNode = (node: Node | null) => {
-    if (!node) {
-        //@ts-ignore
-        currentNode.value = null;
-        activeId.value = null
-        mainRef.value.update('')
-        return;
+    let ret = []
+    for (let i = 0; i < id.length; i++) {
+        let item = mapCache.value.get(id[i]) as MapValue;
+        item.dirty = false;
+        ret.push({
+            id: id[i],
+            source: item.source
+        })
     }
-    mainRef.value.update(getCacheCode(node));
-    currentNode.value = node;
-    activeId.value = node.id;
-}
-const openEditor = (node: Node) => {
-    resetCache();
-    dialogVisible.value = true;
-    nodes = props.mgraph.getGraph().getNodes();
-    nextTick(() => {
-        sideBarRef.value.update();
-        tabBarRef.value.update();
-        setCurrentNode(node);
-        tabBarRef.value.addNode(node);
-    })
+
+    emits('save', ret)
+
 }
 
-const onClickSideBarItem = (node: Node) => {
-    flushToMap();
-    setCurrentNode(node);
-    tabBarRef.value.addNode(node);
+
+const checkIsDirty = (id?: string) => {
+    let ids = id ? [id] : props.lists.map((n) => n.id)
+
+    for (let i = 0; i < ids.length; i++) {
+        if (mapCache.value.get(ids[i])?.dirty) return true;
+    }
+    return false;
 }
+
+
+const onClickSideBarItem = (item: ListItem) => {
+    activeId.value = item.id
+}
+
+const saveCurrentCM = () => {
+    flushToNode(activeId.value);
+}
+
 
 const saveConfirm = async () => {
     let ret
@@ -185,7 +138,6 @@ const saveConfirm = async () => {
 
         )
 
-        flushToNode();
 
     } catch (err) {
         return err
@@ -195,30 +147,40 @@ const saveConfirm = async () => {
 }
 
 
-const closeCurrentTab = async () => {
+const onClickTab = (item: ListItem) => {
+    activeId.value = item.id;
+}
 
-    if (checkCurrentHasChange()) {
+
+const onCloseTab = async (id: string) => {
+
+    if (checkIsDirty(id)) {
         let ret = await saveConfirm();
         if (ret === "close") return;
-        if (ret === "cancel") resetCache(currentNode.value.id);
-        if (ret === "confirm") flushToNode(currentNode.value.id);
-
+        if (ret === "cancel") resetCache(activeId.value);
+        if (ret === "confirm") flushToNode(activeId.value);
     }
 
-    let preNodeId = currentNode.value.id;
-    let nextNode = tabBarRef.value.getNextNode();
-    setCurrentNode(nextNode);
-    tabBarRef.value.deleteNode(preNodeId)
+    let next = tabBarRef.value.getNextItem();
+
+    if(next) {
+        activeId.value = next.id;
+    } else {
+        activeId.value = null;
+    }
+
+    tabBarRef.value.deleteItem(id);
 }
 
-const onClickTab = (node: Node) => {
-    flushToMap();
-    setCurrentNode(node);
+const open = async (id: string) => {
+    resetCache();
+    dialogVisible.value = true
+    await nextTick();
+    activeId.value = id;
 }
 
-const onCloseClick = async () => {
-
-    if (checkCacheHasChange() || checkCurrentHasChange()) {
+const onCloseDialog = async () => {
+    if (checkIsDirty()) {
         let ret = await saveConfirm();
         if (ret === "close") return;
         if (ret === "cancel") resetCache();
@@ -226,16 +188,25 @@ const onCloseClick = async () => {
     }
 
     dialogVisible.value = false;
-
 }
 
-const saveCurrentCM = () => {
-    flushToNode(currentNode.value.id);
-}
+const dispatchCurrentCM = (doc: string) => {
 
+    let id = activeId.value;
+    if (!id) return;
+    let source = _.find(props.lists, { id })?.source;
+    let item = mapCache.value.get(id) as MapValue
+    if (doc !== source) {
+        item.dirty = true;
+
+    } else {
+        item.dirty = false;
+    }
+    item.source = doc;
+}
 
 defineExpose({
-    openEditor
+    open
 })
 
 
@@ -243,25 +214,18 @@ defineExpose({
 
 <template>
     <div class="editor-wrap">
-        <el-dialog 
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        v-model="dialogVisible" width="80%" top="5vh" >
+        <el-dialog style="border-radius:10px" :close-on-click-modal="false" :close-on-press-escape="false"
+            v-model="dialogVisible" width="80%" top="5vh">
 
-            <div slot="header" class="header flex-center relative">
-                {{ mgraph.getName() }}
-                <el-icon class="close-icon" color="black" size="12" @click="onCloseClick">
-                    <Close />
-                </el-icon>
-            </div>
+            <div slot="header"></div>
             <div class="content-wrap w-full">
                 <CodeEditorSideBarVue :activeId="activeId" @click-item="onClickSideBarItem" ref="sideBarRef"
-                    :mgraph="props.mgraph" />
+                    :lists="props.lists" />
                 <div class="code-wrap h-full">
-                    <CodeEditorTabBarVue :map="mapCache" @click="onClickTab" @close="closeCurrentTab"
-                        :activeId="activeId" :mgraph="props.mgraph" ref="tabBarRef" />
+                    <CodeEditorTabBarVue @close-all="onCloseDialog" :map="mapCache" @click="onClickTab"
+                        @close="onCloseTab" :lists="props.lists" :activeId="activeId" ref="tabBarRef" />
 
-                    <CodeEditorMainVue @save="saveCurrentCM" ref="mainRef" :node="currentNode" />
+                    <CodeEditorMainVue @dispatch="dispatchCurrentCM" @save="saveCurrentCM" ref="mainRef" />
                 </div>
             </div>
 
@@ -273,8 +237,6 @@ defineExpose({
 
 <style lang="less" scoped>
 .editor-wrap {
-
-
     :deep(.el-dialog__body) {
         padding: 0px;
     }

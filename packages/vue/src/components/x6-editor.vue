@@ -1,7 +1,7 @@
 
 <script lang="ts" setup>
 
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import { mGraph } from '../core/graph';
 import { Node, NodeView } from '@antv/x6'
 import codeEditorVue from './code-editor/index.vue';
@@ -18,7 +18,7 @@ let props = defineProps<
 >()
 
 const emits = defineEmits<{
-    (e:"save"):void
+    (e: "save"): void
 }>()
 
 let drawerVisible = ref(false)
@@ -83,7 +83,7 @@ const onConfirmClick = async () => {
         currentNode.value?.setData(_.cloneDeep(nodeData.value));
 
         emits('save')
-        
+
     } catch (error) {
         console.log(error);
     }
@@ -97,8 +97,34 @@ const open = (param: Param) => {
     drawerVisible.value = true
 }
 
-const onEditCodeClick = () => {
-    codeEditorRef.value.openEditor(currentNode.value);
+let codeLists = ref();
+const onEditCodeClick = async () => {
+    let nodes = props.mgraph.getGraph().getNodes();
+    codeLists.value = nodes.map((node) => {
+        let data = node.getData();
+        let { base , code } = data;
+        return {
+            id: node.id,
+            source: code.source ,
+            name:base.name || "未命名"
+        }
+    })
+
+    await nextTick();
+
+    codeEditorRef.value.open(currentNode.value?.id);
+}
+
+const onSaveCode = (list: Array<Record<any, any>>) => {
+    let nodes = props.mgraph.getGraph().getNodes();
+    for (let i = 0; i < list.length; i++) {
+        let item = list[i];
+        let { id, source } = item;
+        let node = _.find(nodes, { id }) as Node
+        let data = node.getData();
+        data.code.source = source;
+        node.setData(data);
+    }
 }
 
 defineExpose({
@@ -110,7 +136,11 @@ defineExpose({
 
     <div class="editor-wrap">
 
-        <codeEditorVue ref="codeEditorRef" :mgraph="props.mgraph" />
+        <codeEditorVue
+        
+         @save="onSaveCode" 
+         ref="codeEditorRef"
+          :lists="codeLists" />
 
         <el-drawer v-model="drawerVisible" title="编辑节点" direction="rtl" size="50%">
             <div class="draw-wrap w-full h-full">

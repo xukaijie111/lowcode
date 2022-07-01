@@ -1,43 +1,27 @@
 
 <script lang="ts" setup>
-import { ref } from 'vue';
-import type {Node} from '@antv/x6'
-import { mGraph } from '../../core/graph';
+
+import type {
+    ListItem
+} from './type'
 
     let props = defineProps<
         {
-            mgraph:mGraph,
-            activeId:string
+            activeId:string,
+            lists:Array<ListItem>
         }
     >()
 
     let emit = defineEmits<{
-        (e:"clickItem",item:Node):void
+        (e:"clickItem",item:ListItem):void
     }>()
-let listNodes = ref<Array<Node>>([])
-const update = () => {
-        let graph = props.mgraph.getGraph();
-        let nodes = graph.getNodes();
-        listNodes.value = nodes.filter((node) => {
-            let data = node.getData();
-            if (data.type) return true
-            else return false;
-        })
-}
 
-const getNodeName = (node:Node) => {
-  let data = node.getData();
-  return data.base.name || "未命名"
-}
 
-const onClickitem = (index:number) => {
-    let item = listNodes.value[index] as Node;
+const onClickitem = (item:ListItem) => {
+
     emit('clickItem',item)
 }
 
-defineExpose({
-    update
-})
 
 </script>
 
@@ -47,9 +31,9 @@ defineExpose({
 
      <div 
 
-     @click="onClickitem(index)"
+     @click="onClickitem(item)"
      :class="props.activeId && props.activeId === item.id ? 'active-item' : ''"
-     v-for="(item,index) in listNodes" class="item w-full ellipsis">{{getNodeName(item as Node)}}</div>
+     v-for="(item) in lists" class="item w-full ellipsis">{{item.name}}</div>
    
   </div>
 </template>

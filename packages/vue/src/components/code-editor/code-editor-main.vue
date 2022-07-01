@@ -2,7 +2,7 @@
 
 <script lang="ts" setup>
 
-import { ref, nextTick } from 'vue';
+import { nextTick } from 'vue';
 import { Extension } from '@codemirror/state';
 import { EditorView, keymap } from '@codemirror/view';
 //import { linter, lintGutter } from '@codemirror/lint';
@@ -13,15 +13,16 @@ import { onMounted } from 'vue';
 
 
 
-let emits = defineEmits< {
-    (e:"save"):void
+let emits = defineEmits<{
+    (e: "dispatch", doc: string): void,
+    (e: "save"): void
 }>()
 
 
-let view = ref<EditorView>();
+let view: EditorView; // 不能用ref定义，内部的值会被proxyed ,影响codemirror里面相关代码判断
 
 
-function dummyKeymap() {
+function Keymap() {
     return keymap.of([{
         key: "cmd-s",
         run() {
@@ -35,11 +36,16 @@ function dummyKeymap() {
 
 const getExtensions = () => {
     let extensions: Extension[] = [
+
         basicSetup,
+
         javascript(),
+
         EditorView.theme({}, { dark: false }),
+
         EditorView.lineWrapping,
-        dummyKeymap(),
+
+        Keymap(),
 
         keymap.of([indentWithTab]),
     ]
@@ -48,10 +54,17 @@ const getExtensions = () => {
 }
 
 const init = async () => {
-    view.value = new EditorView({
+    view = new EditorView({
         doc: "",
         extensions: getExtensions(),
         parent: document.getElementById('editor') as Element,
+        dispatch: ((tr) => {
+            view?.update([tr])
+
+            let doc = view.state.doc.toString();
+            emits('dispatch', doc)
+
+        })
 
     })
 
@@ -59,16 +72,12 @@ const init = async () => {
 
 }
 
-const getCurrentCM = () => {
-    return view.value?.state.doc.toString();
-}
 
 
-const update = (source:string) => {
 
-   let doc = view.value?.state.doc.toString() || "";
-
-    view.value?.dispatch({
+const update = (source: string) => {
+    let doc = view.state.doc.toString() || "";
+    view.dispatch({
         changes: { from: 0, to: doc.length, insert: source }
     });
 }
@@ -78,8 +87,7 @@ onMounted(() => {
 })
 
 defineExpose({
-    update,
-    getCurrentCM
+    update
 })
 
 </script>
