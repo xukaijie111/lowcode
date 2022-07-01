@@ -69,7 +69,8 @@ const nodeValidCheck = async () => {
 const onConfirmClick = async () => {
     try {
         await nodeValidCheck();
-        let { base } = nodeData.value;
+        let data = currentNode.value?.getData();
+        let { base } = data
         let { name } = base;
         if (name) {
             console.log(`设置name ${name}`)
@@ -80,7 +81,7 @@ const onConfirmClick = async () => {
             })
         }
 
-        currentNode.value?.setData(_.cloneDeep(nodeData.value));
+        currentNode.value?.setData(_.cloneDeep(data));
 
         emits('save')
 
@@ -122,8 +123,10 @@ const onSaveCode = (list: Array<Record<any, any>>) => {
         let { id, source } = item;
         let node = _.find(nodes, { id }) as Node
         let data = node.getData();
+          console.log(`###node .get before is `,_.cloneDeep(data),source)
         data.code.source = source;
-        node.setData(data);
+        node.setData(_.cloneDeep(data));
+        console.log(`###node .get after is `,_.cloneDeep(node.getData()))
     }
 }
 
@@ -137,7 +140,7 @@ defineExpose({
     <div class="editor-wrap">
 
         <codeEditorVue
-        
+
          @save="onSaveCode" 
          ref="codeEditorRef"
           :lists="codeLists" />

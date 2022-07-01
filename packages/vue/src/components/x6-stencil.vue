@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { defineExpose } from 'vue'
 import { mGraph } from '../core/graph';
 
 const init = (mgraph: mGraph) => {

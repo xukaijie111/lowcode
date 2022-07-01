@@ -13,11 +13,15 @@ import {
     NodeMetaData
 } from '@lowcode/shared'
 
-import { parseDependency, checkCodeInValid } from '../common/util'
+import { parseDependency, checkCodeInValid,emitFile } from '../common/util'
+
+let path = require('path')
+let dslRoot = path.resolve(__dirname,'../../../core/src/dsl')
 
 export class ProcessController extends Controller {
     public path = "/process";
     public router: Router = Router();
+    
 
     constructor({
         mongodb
@@ -77,7 +81,7 @@ export class ProcessController extends Controller {
         let nodes = this.getNodes(config.cells);
         for (let i = 0; i < nodes.length; i++) {
             let node = nodes[i];
-            let { data: { code: source, base: { name } } } = node;
+            let { data: { code: { source }, base: { name } } } = node;
             let ret = checkCodeInValid(source)
             if (ret) {
                 return response.fail(`节点${name} 代码错误 ${ret}`)
@@ -86,22 +90,28 @@ export class ProcessController extends Controller {
 
 
         this.destructDslMetaData(config);
-        this.codeGen(config);
+        this.codeGen(request.body);
         await super.edit(request.body);
 
         return response.ok(null);
     }
 
 
-    private codeGen(config) {
+    private codeGen(body) {
+        let { basic:{name},config} = body;
         let { cells } = config;
         let nodes = this.getNodes(cells)
         let deps = new Set();
         for (let i = 0; i < nodes.length; i++) {
             let node = nodes[i];
-            let { data: { code: source } } = node;
+            let { data: { code: { source },base:{ name:node_name}} } = node;
             parseDependency(source);
+            emitFile(`${dslRoot}/${name}/${node_name}.js`,source)
         }
+
+     
+
+
 
     }
 
