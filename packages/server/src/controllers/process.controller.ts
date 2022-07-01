@@ -76,7 +76,7 @@ export class ProcessController extends Controller {
 
     private deployDsl = async (request: Request, response: IResponse, next: NextFunction) => {
 
-        let { config } = request.body;
+        let { config,basic:{name} } = request.body;
 
         let nodes = this.getNodes(config.cells);
         for (let i = 0; i < nodes.length; i++) {
@@ -89,8 +89,15 @@ export class ProcessController extends Controller {
         }
 
 
-        this.destructDslMetaData(config);
+        // 元数据，供pipe使用
+        let { meta } = this.destructDslMetaData(config);
+        emitFile(`${dslRoot}/${name}/meta.json`,JSON.stringify(meta,'','\t'));
+
+
+        // 代码生成到对应目录
         this.codeGen(request.body);
+
+        // 保存x6 config
         await super.edit(request.body);
 
         return response.ok(null);
@@ -193,7 +200,6 @@ export class ProcessController extends Controller {
 
         deepMetaData(currentNode, meta);
 
-        console.log(`###meta is `, meta);
         return {
             meta
         }

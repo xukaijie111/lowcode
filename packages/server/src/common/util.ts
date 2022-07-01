@@ -41,11 +41,9 @@ export function parseDependency(source:string) {
       }
     })
 
-    console.log(`####ret is `, ret);
 
     return ret;
   } catch (err) {
-    console.log(err)
     return []
   }
 

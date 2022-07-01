@@ -293,8 +293,12 @@ export class mGraph extends Event {
         for (let i = 0; i < nodes.length;i++) {
             let node = nodes[i];
             let { data } = node;
-            let { base } = data;
+            let { base,code } = data;
             let  { name } = base;
+            if (!code.source) {
+                ret.errorMsg = `存在节点未实现功能`
+                return ret;
+            }
             if (!name) {
                 ret.errorMsg = `存在节点基本信息未填名称`
                 return ret;

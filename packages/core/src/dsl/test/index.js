@@ -1,0 +1,2 @@
+
+import Pipe from '../../pipe'
