@@ -15,6 +15,10 @@ import {
 
 import { parseDependency, checkCodeInValid,emitFile } from '../common/util'
 
+import {
+    Compilation
+} from '../codegen/compilation'
+
 let path = require('path')
 let dslRoot = path.resolve(__dirname,'../../../core/src/dsl')
 
@@ -76,136 +80,34 @@ export class ProcessController extends Controller {
 
     private deployDsl = async (request: Request, response: IResponse, next: NextFunction) => {
 
-        let { config,basic:{name} } = request.body;
+        let { config,basic } = request.body;
 
-        let nodes = this.getNodes(config.cells);
-        for (let i = 0; i < nodes.length; i++) {
-            let node = nodes[i];
-            let { data: { code: { source }, base: { name } } } = node;
-            let ret = checkCodeInValid(source)
-            if (ret) {
-                return response.fail(`节点${name} 代码错误 ${ret}`)
-            }
+        let options = {
+            config,
+            basic,
         }
 
+        let compilation = new Compilation({
+            options
+        })
+
+        let ret = compilation.checkSource();
+        if (ret) {
+            return response.fail(ret)
+        }
+
+    
 
         // 元数据，供pipe使用
-        let { meta } = this.destructDslMetaData(config);
-        emitFile(`${dslRoot}/${name}/meta.json`,JSON.stringify(meta,'','\t'));
+        let meta = compilation.generateMeta();
 
-
-        // 代码生成到对应目录
-        this.codeGen(request.body);
-
+        console.log(`###meta is `,meta)
+       
         // 保存x6 config
         await super.edit(request.body);
 
         return response.ok(null);
     }
-
-
-    private codeGen(body) {
-        let { basic:{name},config} = body;
-        let { cells } = config;
-        let nodes = this.getNodes(cells)
-        let deps = new Set();
-        for (let i = 0; i < nodes.length; i++) {
-            let node = nodes[i];
-            let { data: { code: { source },base:{ name:node_name}} } = node;
-            parseDependency(source);
-            emitFile(`${dslRoot}/${name}/${node_name}.js`,source)
-        }
-
-     
-
-
-
-    }
-
-    private getNodes(cells) {
-
-        return cells.filter((c) => {
-            let values = Object.values(NodeShape);
-            return values.includes(c.shape);
-        })
-    }
-
-
-    // 精简元数据
-    private destructDslMetaData(config) {
-
-        let cache = {};
-        let { cells } = config;
-        let edges = cells.filter((c) => c.shape === "edge")
-        let nodes = this.getNodes(cells);
-        let startNode = _.find(nodes, (node) => node.data.type === "start")
-
-        function getNextNode(node, portId) {
-            let query = { cell: node.id, port: portId };
-            let edge = _.find(edges, { source: query })
-            if (!edge) return;
-            let { target } = edge;
-            let { cell } = target;
-
-            let n = _.find(nodes, { id: cell })
-            return n;
-        }
-
-        function generateNodeDsl(node): NodeMetaData {
-
-            if (cache[node.id]) return cache[node.id]
-            let { data: { base, type } } = node;
-            let ret: NodeMetaData = {
-                name: base.name,
-                description: base.description,
-                type,
-                next: null
-            }
-
-            if (type === NodeType.CHECK) {
-                (ret as CheckNodeMetaData).elseNext = null;
-            }
-            return ret;
-        }
-
-        let currentNode = startNode;
-        let meta = generateNodeDsl(currentNode);
-
-        function deepMetaData(currentNode, meta) {
-            if (cache[currentNode.id]) return;
-            cache[currentNode.id] = meta;
-            let { data } = currentNode;
-            if (data.type === NodeType.END) return;
-            let { ports: { items } } = currentNode;
-            let rightPort = _.find(items, { group: 'right' });
-            if (rightPort) {
-                let targetNode = getNextNode(currentNode, rightPort.id);
-                if (targetNode) {
-                    meta.next = generateNodeDsl(targetNode);
-                    deepMetaData(targetNode, meta.next)
-                }
-            }
-
-            if (data.type === NodeType.CHECK) {
-                let downPort = _.find(items, { group: 'down' });
-                if (downPort) {
-                    let targetNode = getNextNode(currentNode, downPort.id);
-                    if (targetNode) {
-                        meta.next = generateNodeDsl(targetNode);
-                        deepMetaData(targetNode, meta.next)
-                    }
-                }
-            }
-        }
-
-        deepMetaData(currentNode, meta);
-
-        return {
-            meta
-        }
-
-    }
-
 
 
 }

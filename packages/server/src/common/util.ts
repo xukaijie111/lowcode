@@ -15,6 +15,16 @@ export function generateId(len = 10) {
 }
 
 
+export function getAst(source:string) {
+
+    try {
+        return parse(source, { sourceType: 'module' });
+    } catch (error) {
+      console.log(error)
+      return;
+    }
+}
+
 
 export function parseDependency(source:string) {
 
@@ -55,7 +65,7 @@ export const checkCodeInValid = (source:string) => {
       return 
     } catch (error) {
       console.log(error);
-      return `代码错误，可至 https://astexplorer.net/ 转换查看`
+      return true
     }
 }
 
