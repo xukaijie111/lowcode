@@ -38,7 +38,7 @@ export function parseDependency(source:string) {
     let ret = [];
     const ast = parse(source, { sourceType: 'module' })
 
-
+    //@ts-ignore
     traverse(ast, {
       enter: path => {
         if (path.node.type === 'ImportDeclaration') {

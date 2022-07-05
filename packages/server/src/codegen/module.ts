@@ -66,6 +66,10 @@ export class Module {
 
     }
 
+    getName() {
+         return this.config.data.base.name;
+    }
+
     getDsl(): NodeMetaData {   
         let { config ,meta } = this;
         if (meta) return meta;
@@ -97,6 +101,11 @@ export class Module {
         let { ports: { items } } = config;
         let rightPort = _.find(items, { group: 'down' });
         return rightPort;
+    }
+
+    getFunctionName() {
+        let name = this.getName();
+        return name.slice(0, 1).toUpperCase() + name.slice(1) +'LowCode';
     }
 
 

@@ -12,8 +12,12 @@ import {
 import * as _ from 'lodash';
 import { Module } from './module';
 
+import MagicString from 'magic-string'
+
+let fse  = require('fs-extra');
+
 import {
-    checkCodeInValid
+    checkCodeInValid, emitFile
 } from '../common/util'
 
 type Common = Record<any, any>
@@ -24,13 +28,17 @@ export class Compilation {
     config: Record<any, any>
     meta: NodeMetaData
     modules:Array<Module>
-    cache:Common
     options:Common
+    outputPath:string
     constructor({
-        options
+        options,
+        outputPath
     }) {
+        let { basic : {name}} = options
+        this.outputPath = `${outputPath}/${name}`
         this.options = options;
         this.config = options.config;
+        this.modules = [];
         let nodes = this.getNodes();
         nodes.forEach((n) => {
             new Module({
@@ -38,6 +46,7 @@ export class Compilation {
                 config:n
             })
         })
+
 
     }
 
@@ -77,14 +86,14 @@ export class Compilation {
         let { modules } = this;
         let startModule = _.find(modules,(module) => module.isStartModule())
 
-        function deepMetaData(module:Module, meta:Common) {
+        const  deepMetaData = (module:Module, meta:Common) => {
             if (cache[module.id]) return;
             cache[module.id] = meta;
             if (module.isEndModule()) return;
 
             let rightPort = module.getRightPort();
             if (rightPort) {
-                let targetModule = this.getNextNode(module, rightPort.id);
+                let targetModule = this.getNextModule(module, rightPort.id);
                 if (targetModule) {
                     meta.next = targetModule.getDsl();
                     deepMetaData(targetModule, meta.next)
@@ -94,7 +103,7 @@ export class Compilation {
             if (module.isCheckModule()) {
                 let downPort = module.getDownport();
                 if (downPort) {
-                    let targetModule = this.getNextNode(module, downPort.id);
+                    let targetModule = this.getNextModule(module, downPort.id);
                     if (targetModule) {
                         meta.next = targetModule.getDsl();
                         deepMetaData(targetModule, meta.next)
@@ -123,6 +132,80 @@ export class Compilation {
                 return `节点${name}代码错误 , 可至 https://astexplorer.net/ 转换查看`;
             }
         }
+
+    }
+
+    deploy() {
+        let meta = this.generateMeta();
+        let { outputPath,modules } = this;
+
+        // 删除整个目录
+        fse.removeSync(`${outputPath}`)
+
+        // 保存元数据
+        //@ts-ignore
+        emitFile(`${outputPath}/meta.json`,JSON.stringify(meta,'','\t'));
+
+       modules.forEach((module) => {
+        let m_name = module.getName();
+        let source = module.getSource();
+        emitFile(`${outputPath}/${m_name}.js`,source)
+       })
+
+       this.getenrateExportNamespace();
+
+
+    }
+
+
+    getenrateExportNamespace() {
+
+        let s = new MagicString(`import Pipe from "../../pipe"`)
+        s.append('\n')
+
+        let { modules,outputPath } = this;
+        let map = {}
+
+        // 导入模块
+        modules.forEach((module) => {
+            let exportName = module.getFunctionName();
+            let name = module.getName();
+            map[name] = exportName
+            s.append(`import ${exportName} from "./${name}"\n`)
+        })
+
+        // 导入meta.json
+
+        s.append(`import meta from "./meta.json"\n`)
+
+        
+        s.append(`let map = {\n`)
+
+
+        for(let name in map) {
+            let exportName = map[name]
+            s.append(`"${name}":${exportName},\n`)
+        }
+        
+
+        s.append('}\n')
+
+        s.append('\n');
+        
+
+        s.append(`
+            let pipe = new Pipe({
+                map,
+                meta
+            })
+        `)
+        s.append('\n')
+        
+
+        s.append(`export default pipe`);
+
+
+        emitFile(`${outputPath}/index.js`,s.toString())
 
     }
 

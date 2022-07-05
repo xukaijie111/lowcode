@@ -88,7 +88,8 @@ export class ProcessController extends Controller {
         }
 
         let compilation = new Compilation({
-            options
+            options,
+            outputPath:dslRoot
         })
 
         let ret = compilation.checkSource();
@@ -97,11 +98,7 @@ export class ProcessController extends Controller {
         }
 
     
-
-        // 元数据，供pipe使用
-        let meta = compilation.generateMeta();
-
-        console.log(`###meta is `,meta)
+        compilation.deploy();
        
         // 保存x6 config
         await super.edit(request.body);

@@ -1,18 +1,16 @@
-
-import Pipe from '../../pipe'
-
-import Start from './start';
-
-import Console from './console';
-
-import Meta from './meta.json';
-
-let list = [
-    Start,
-    Console
-]
+import Pipe from "../../pipe"
+import StartLowCode from "./start"
+import ConsoleLowCode from "./console"
+import meta from "./meta.json"
+let map = {
+"start":StartLowCode,
+"console":ConsoleLowCode,
+}
 
 
-let pipe = new Pipe(Meta,list)
-
-export default pipe;
+            let pipe = new Pipe({
+                map,
+                meta
+            })
+        
+export default pipe
