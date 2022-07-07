@@ -15,24 +15,24 @@ export class  Pipe {
 
     async run() {
         let meta = this.meta;
-        let { name }  = meta;
+
         let result 
 
         while(true) {
 
-            let next
+            let { name }  = meta;
             let exec  = this.getFunctionByName(name)
             if (!exec) break;
             let ret:unknown = await exec(this,result)
             if (this.isCheckNode(meta)) {
-                if (ret) next = meta.next;
-                else next = meta.elseNext;
+                if (ret) meta = meta.next;
+                else meta = meta.elseNext;
             }else {
                 result = ret;
-                next = meta.next;
+                meta = meta.next;
             }
    
-            if (!next) break;
+            if (!meta) break;
 
         }
 

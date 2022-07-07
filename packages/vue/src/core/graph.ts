@@ -267,7 +267,7 @@ export class mGraph extends Event {
         let edges = cells.filter((c) => c.shape === "edge")
         let nodes = cells.filter((c) =>{
             let values = Object.values(NodeShape);
-           return values.includes(c.shape);
+           return values.includes(c.shape as string);
         })
 
         let startNode = _.find(nodes,(node) => node.data.type === NodeType.START)
@@ -293,12 +293,23 @@ export class mGraph extends Event {
         for (let i = 0; i < nodes.length;i++) {
             let node = nodes[i];
             let { data } = node;
-            let { base,code } = data;
+            let { base,code:{source,type,other} } = data;
             let  { name } = base;
-            if (!code.source) {
-                ret.errorMsg = `存在节点未实现功能`
-                return ret;
+
+            if (type === "self") {
+                if (!source) {
+                    ret.errorMsg = `节点${name}未实现代码功能`
+                    return ret;
+                }
             }
+
+            if (type === "other") {
+                if (!other) {
+                    ret.errorMsg = `节点${name}未选择实现方式`
+                    return ret;
+                }
+            }
+           
             if (!name) {
                 ret.errorMsg = `存在节点基本信息未填名称`
                 return ret;
@@ -569,7 +580,9 @@ export namespace mGraph {
 
         },
         code: {
-            source: "export default async function(pipe){}"
+            source: "export default async function(pipe){}",
+            type:"self",
+            other:""
         },
         detail: {
 

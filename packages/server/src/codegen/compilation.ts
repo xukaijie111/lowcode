@@ -20,6 +20,8 @@ import {
     checkCodeInValid, emitFile
 } from '../common/util'
 
+const defaultPlugins = require('./plugins/index')
+
 type Common = Record<any, any>
 
 type CommonArray = Array<Common>
@@ -30,6 +32,7 @@ export class Compilation {
     modules:Array<Module>
     options:Common
     outputPath:string
+    plugins:Record<any,any>
     constructor({
         options,
         outputPath
@@ -39,6 +42,14 @@ export class Compilation {
         this.options = options;
         this.config = options.config;
         this.modules = [];
+
+        this.plugins =  { 
+            'afterAddModule':[],
+            'codeGen':[], // 开始生成目标文件
+        };
+
+        this.initPlugins();
+
         let nodes = this.getNodes();
         nodes.forEach((n) => {
             new Module({
@@ -47,12 +58,37 @@ export class Compilation {
             })
         })
 
-
     }
 
-    addModule(m:Module) {
+    async run() {
+        await this.callPlugin('codeGen')
+    }
+
+
+    async callPlugin(name:string,...args:Array<unknown>) {
+        let plugins = this.plugins[name];
+        if (!plugins) return;
+
+        for (let p of plugins) {
+        await p.call(this,...args)
+        }
+    }
+
+
+    async initPlugins() {
+        let plugins = this.options.plugins || [];
+        plugins = defaultPlugins.concat(plugins)
+        plugins.forEach((p)=>{
+        p.apply(this)
+        })
+ 
+  }
+
+
+    async addModule(m:Module) {
         if (_.find(this.modules,{ id: m.id})) return this
         this.modules.push(m)
+        await this.callPlugin('afterAddModule',m);
         return this;
     }
 
@@ -132,80 +168,6 @@ export class Compilation {
                 return `节点${name}代码错误 , 可至 https://astexplorer.net/ 转换查看`;
             }
         }
-
-    }
-
-    deploy() {
-        let meta = this.generateMeta();
-        let { outputPath,modules } = this;
-
-        // 删除整个目录
-        fse.removeSync(`${outputPath}`)
-
-        // 保存元数据
-        //@ts-ignore
-        emitFile(`${outputPath}/meta.json`,JSON.stringify(meta,'','\t'));
-
-       modules.forEach((module) => {
-        let m_name = module.getName();
-        let source = module.getSource();
-        emitFile(`${outputPath}/${m_name}.js`,source)
-       })
-
-       this.getenrateExportNamespace();
-
-
-    }
-
-
-    getenrateExportNamespace() {
-
-        let s = new MagicString(`import Pipe from "../../pipe"`)
-        s.append('\n')
-
-        let { modules,outputPath } = this;
-        let map = {}
-
-        // 导入模块
-        modules.forEach((module) => {
-            let exportName = module.getFunctionName();
-            let name = module.getName();
-            map[name] = exportName
-            s.append(`import ${exportName} from "./${name}"\n`)
-        })
-
-        // 导入meta.json
-
-        s.append(`import meta from "./meta.json"\n`)
-
-        
-        s.append(`let map = {\n`)
-
-
-        for(let name in map) {
-            let exportName = map[name]
-            s.append(`"${name}":${exportName},\n`)
-        }
-        
-
-        s.append('}\n')
-
-        s.append('\n');
-        
-
-        s.append(`
-            let pipe = new Pipe({
-                map,
-                meta
-            })
-        `)
-        s.append('\n')
-        
-
-        s.append(`export default pipe`);
-
-
-        emitFile(`${outputPath}/index.js`,s.toString())
 
     }
 

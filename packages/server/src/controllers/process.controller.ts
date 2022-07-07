@@ -98,7 +98,7 @@ export class ProcessController extends Controller {
         }
 
     
-        compilation.deploy();
+        compilation.run();
        
         // 保存x6 config
         await super.edit(request.body);

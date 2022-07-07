@@ -28,6 +28,7 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.3",
     "@lowcode/shared":"1.0.0",
+    "@lowcode/core":"1.0.0",
     "typescript": "^4.5.4",
     "vite": "^2.9.9",
     "vue-tsc": "^0.34.7"

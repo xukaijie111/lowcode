@@ -30,6 +30,7 @@ export class Module {
     ast:ParseResult<unknown>
     deps:Array<string>
     meta:NodeMetaData
+    source:string
     constructor({
         compilation,
         config
@@ -41,6 +42,7 @@ export class Module {
         this.init();
         this.ast = getAst(this.getSource());
         this.deps = parseDependency(this.getSource())
+        this.source = ""
     }
 
     isStartModule() {
@@ -56,13 +58,13 @@ export class Module {
     }
 
     init() {
-        let { config } = this;
-        let { data :{code : { source }} }= config;
-        config.data.code.raw_source = source;
+        // let { config } = this;
+        // let { data :{code : { source }} }= config;
+        // config.data.code.raw_source = source;
     }
 
     getSource() {
-       return this.config.data.code.raw_source;
+       return this.source
 
     }
 

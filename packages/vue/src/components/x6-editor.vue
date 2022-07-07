@@ -9,7 +9,14 @@ import codeEditorVue from './code-editor/index.vue';
 import type { TabsPaneContext } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { nodeRule } from '../common/rule'
+
+import processStartParamFormVue from './process-start-param-form.vue';
+
 import _ from 'lodash'
+
+import {
+    run
+} from '../core/run'
 
 let props = defineProps<
     {
@@ -28,7 +35,7 @@ type Param = {
     view: NodeView
 }
 
-type TabEnum = "base" | "code" | "detail"
+type TabEnum = "base" | "code" | "detail" | "test"
 
 //const baseRule = ref(nodeRule)
 
@@ -38,6 +45,7 @@ const currentNode = ref<Node>()
 const nodeData = ref<any>();
 const baseRef = ref();
 const codeEditorRef = ref();
+const paramRef = ref();
 
 
 const handleClickTab = (tab: TabsPaneContext, event: Event) => {
@@ -123,13 +131,19 @@ const onSaveCode = (list: Array<Record<any, any>>) => {
         let { id, source } = item;
         let node = _.find(nodes, { id }) as Node
         let data = node.getData();
-          console.log(`###node .get before is `,_.cloneDeep(data),source)
         data.code.source = source;
         node.setData(_.cloneDeep(data));
-        console.log(`###node .get after is `,_.cloneDeep(node.getData()))
     }
 }
 
+
+const onTestClick = async () => {
+        if (!paramRef.value.checkParamValidate()) return ;
+        let name = props.mgraph.getName();
+        await run(name);
+
+
+}
 defineExpose({
     open
 })
@@ -152,6 +166,8 @@ defineExpose({
                         <el-tab-pane label="基本信息" name="base"></el-tab-pane>
                         <el-tab-pane label="代码" name="code"></el-tab-pane>
                         <el-tab-pane label="详情" name="detail"></el-tab-pane>
+
+                         <!-- <el-tab-pane label="测试" name="test"></el-tab-pane> -->
                     </el-tabs>
 
 
@@ -170,24 +186,35 @@ defineExpose({
                         </div>
 
                         <div v-show="activeName === 'code'">
-                            <el-radio-group v-model="nodeData.code.mode" class="w-full">
+                            <el-radio-group v-model="nodeData.code.type" class="w-full">
                                 <el-radio label="self">自定义实现</el-radio>
-                                <el-radio label="imoort">引入其他流</el-radio>
+                                <el-radio label="other">引入其他流</el-radio>
                             </el-radio-group>
                             <div v-if="nodeData.code.mode === 'self'">
                                 <el-button type="primary" @click="onEditCodeClick">编辑</el-button>
                             </div>
 
-                            <div v-if="nodeData.code.mode === 'imoort'">
+                            <div v-if="nodeData.code.mode === 'other'">
                                 <el-button type="primary">选择</el-button>
                             </div>
                         </div>
 
 
+
+                        <div v-show="activeName === 'test'">
+
+                                <processStartParamFormVue ref="paramRef"/>
+
+                        </div>
+
+
+
+
                     </div>
                 </div>
 
-                <el-button type="primary" @click="onConfirmClick">保存</el-button>
+                <el-button type="primary"  v-if="activeName !== 'test'" @click="onConfirmClick">保存</el-button>
+                  <el-button type="primary" v-if="activeName === 'test'" @click="onTestClick">测试</el-button>
             </div>
 
         </el-drawer>
