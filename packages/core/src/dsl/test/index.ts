@@ -1,4 +1,4 @@
-import Pipe from "../../pipe"
+import { Pipe } from "../../pipe"
 import StartLowCode from "./start"
 import ConsoleLowCode from "./console"
 import meta from "./meta.json"

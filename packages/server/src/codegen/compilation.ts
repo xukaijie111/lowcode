@@ -38,6 +38,7 @@ export class Compilation {
     outputPath:string
     plugins:Record<any,any>
     mongodb:Mongodb
+    rootOutput:string
     constructor({
         options,
         outputPath,
@@ -45,7 +46,8 @@ export class Compilation {
     }) {
         this.mongodb = mongodb;
         let { basic : {name}} = options
-        this.outputPath = `${outputPath}/${name}`
+        this.rootOutput = outputPath;
+        this.outputPath = `${outputPath}/src/dsl/${name}`
         this.options = options;
         this.config = options.config;
         this.modules = [];
@@ -53,6 +55,7 @@ export class Compilation {
         this.plugins =  { 
             'afterAddModule':[],
             'codeGen':[], // 开始生成目标文件
+            'endCodeGen':[]
         };
 
         this.initPlugins();
@@ -69,6 +72,7 @@ export class Compilation {
 
     async run() {
         await this.callPlugin('codeGen')
+        await this.callPlugin('endCodeGen')
     }
 
 

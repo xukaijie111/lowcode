@@ -20,7 +20,7 @@ import {
 } from '../codegen/compilation'
 
 let path = require('path')
-let dslRoot = path.resolve(__dirname, '../../../core/src/dsl')
+let dslRoot = path.resolve(__dirname, '../../../core')
 
 export class ProcessController extends Controller {
     public path = "/process";
@@ -102,7 +102,7 @@ export class ProcessController extends Controller {
 
 
 
-            compilation.run();
+            await compilation.run();
 
             // 保存x6 config
             await super.edit(request.body);

@@ -219,7 +219,7 @@ defineExpose({
                                         :value="item.id" />
                                 </el-select>
                             </el-radio-group>
-                            <div v-if="nodeData.code.type === 'self'">
+                            <div v-if="nodeData.code.mode === 'self'">
                                 <el-button type="primary" @click="onEditCodeClick">编辑</el-button>
                             </div>
 
