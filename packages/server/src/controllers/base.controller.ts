@@ -4,13 +4,15 @@ import { Collection } from 'mongodb';
 import { IResponse } from '../app'
 import { generateId } from '../common/util';
 import * as _ from 'lodash'
+import { Mongodb } from 'src/mongo';
 
 
 export class Controller {
     protected collect:Collection
-    constructor(){
-       
-    }
+    mongodb:Mongodb
+    constructor({mongodb}){
+        this.mongodb = mongodb
+    }   
 
     async get(body:Request["body"],keys:Array<string>)  {
 

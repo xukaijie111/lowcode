@@ -16,7 +16,7 @@ export function generateId(len = 10) {
 
 
 export function getAst(source:string) {
-
+  console.log(`getast source is `,source);
     try {
         return parse(source, { sourceType: 'module' });
     } catch (error) {

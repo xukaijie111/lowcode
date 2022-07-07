@@ -168,7 +168,9 @@ const onDeployDsl = async () => {
             </div>
 
 
-            <x6EditorVue ref="editor" :mgraph="(mgraph as mGraph)" @save="onSaveDsl"/>
+            <x6EditorVue 
+            :id="id"
+            ref="editor" :mgraph="(mgraph as mGraph)" @save="onSaveDsl"/>
         </div>
     </div>
 </template>

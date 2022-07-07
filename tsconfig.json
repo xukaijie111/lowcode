@@ -24,5 +24,8 @@
   },
   "include": [
     "packages/*/src",
+  ],
+  "exclude": [
+    "packages/core/src/dsl"
   ]
 }

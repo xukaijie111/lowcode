@@ -13,24 +13,23 @@ import {
     NodeMetaData
 } from '@lowcode/shared'
 
-import { parseDependency, checkCodeInValid,emitFile } from '../common/util'
+import { parseDependency, checkCodeInValid, emitFile } from '../common/util'
 
 import {
     Compilation
 } from '../codegen/compilation'
 
 let path = require('path')
-let dslRoot = path.resolve(__dirname,'../../../core/src/dsl')
+let dslRoot = path.resolve(__dirname, '../../../core/src/dsl')
 
 export class ProcessController extends Controller {
     public path = "/process";
     public router: Router = Router();
-    
 
     constructor({
         mongodb
     }: ProcessController.options) {
-        super();
+        super({ mongodb });
         this.collect = mongodb.getCollection('process');
         this.initializeRoutes();
 
@@ -41,6 +40,7 @@ export class ProcessController extends Controller {
         this.router.post(`${this.path}/detail`, this.getDetail);
         this.router.post(`${this.path}/delete`, this.processDelete);
         this.router.post(`${this.path}/deploy`, this.deployDsl);
+        this.router.post(`${this.path}/otherProcessList`, this.getOtherProcessList)
     }
 
     private getProcessList = async (request: Request, response: IResponse, next: NextFunction) => {
@@ -80,31 +80,61 @@ export class ProcessController extends Controller {
 
     private deployDsl = async (request: Request, response: IResponse, next: NextFunction) => {
 
-        let { config,basic } = request.body;
+        let { config, basic } = request.body;
 
         let options = {
             config,
             basic,
         }
 
-        let compilation = new Compilation({
-            options,
-            outputPath:dslRoot
-        })
+        try {
+            let compilation = new Compilation({
+                options,
+                outputPath: dslRoot,
+                mongodb:this.mongodb
+            })
 
-        let ret = compilation.checkSource();
-        if (ret) {
-            return response.fail(ret)
+            let ret = compilation.checkSource();
+            if (ret) {
+                return response.fail(ret)
+            }
+
+
+
+
+            compilation.run();
+
+            // 保存x6 config
+            await super.edit(request.body);
+
+            return response.ok(null);
+        } catch (err) {
+
+            return response.fail(`部署失败`)
+        }
+    }
+
+
+    getOtherProcessList = async (request: Request, response: IResponse, next: NextFunction) => {
+
+        let { body } = request;
+        let { id, name } = body
+
+        let query: Record<any, any> = {
+            id:{$ne:id}
+        };
+        if (name) {
+            query['basic.name'] = {
+                $regex: new RegExp(name, 'i')
+            }
         }
 
-    
-        compilation.run();
-       
-        // 保存x6 config
-        await super.edit(request.body);
-
-        return response.ok(null);
+        let list = await this.collect.find(query).toArray();
+        return response.ok(list);
     }
+
+
+
 
 
 }

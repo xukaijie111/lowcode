@@ -8,9 +8,9 @@ let map = {
 }
 
 
-let pipe = new Pipe({
-    map,
-    meta
-})
+            let pipe = new Pipe({
+                map,
+                meta
+            })
         
 export default pipe

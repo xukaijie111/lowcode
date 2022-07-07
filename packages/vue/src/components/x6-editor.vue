@@ -18,9 +18,14 @@ import {
     run
 } from '../core/run'
 
+import {
+    getOtherProcessList
+} from '../common/api'
+
 let props = defineProps<
     {
         mgraph: mGraph
+        id: string
     }
 >()
 
@@ -47,6 +52,7 @@ const baseRef = ref();
 const codeEditorRef = ref();
 const paramRef = ref();
 
+const otherProcessLists = ref();
 
 const handleClickTab = (tab: TabsPaneContext, event: Event) => {
     event.stopPropagation();
@@ -77,11 +83,12 @@ const nodeValidCheck = async () => {
 const onConfirmClick = async () => {
     try {
         await nodeValidCheck();
-        let data = currentNode.value?.getData();
+
+        // 设置名称
+        let data = nodeData.value;
         let { base } = data
         let { name } = base;
         if (name) {
-            console.log(`设置name ${name}`)
             currentNode.value?.attr({
                 label: {
                     text: name
@@ -111,11 +118,11 @@ const onEditCodeClick = async () => {
     let nodes = props.mgraph.getGraph().getNodes();
     codeLists.value = nodes.map((node) => {
         let data = node.getData();
-        let { base , code } = data;
+        let { base, code } = data;
         return {
             id: node.id,
-            source: code.source ,
-            name:base.name || "未命名"
+            source: code.source,
+            name: base.name || "未命名"
         }
     })
 
@@ -133,14 +140,33 @@ const onSaveCode = (list: Array<Record<any, any>>) => {
         let data = node.getData();
         data.code.source = source;
         node.setData(_.cloneDeep(data));
+
+        // 同步当前的临时nodeData中
+        if (currentNode.value?.id === id) {
+            nodeData.value.code.source = source;
+        }
+
     }
 }
 
 
 const onTestClick = async () => {
-        if (!paramRef.value.checkParamValidate()) return ;
-        let name = props.mgraph.getName();
-        await run(name);
+    if (!paramRef.value.checkParamValidate()) return;
+    let name = props.mgraph.getName();
+    await run(name);
+}
+
+const remoteMethod = async (name: string) => {
+    try {
+        let ret = await getOtherProcessList({
+            id: props.id,
+            name
+        })
+        otherProcessLists.value = ret;
+
+    } catch (err) {
+
+    }
 
 
 }
@@ -153,11 +179,7 @@ defineExpose({
 
     <div class="editor-wrap">
 
-        <codeEditorVue
-
-         @save="onSaveCode" 
-         ref="codeEditorRef"
-          :lists="codeLists" />
+        <codeEditorVue @save="onSaveCode" ref="codeEditorRef" :lists="codeLists" />
 
         <el-drawer v-model="drawerVisible" title="编辑节点" direction="rtl" size="50%">
             <div class="draw-wrap w-full h-full">
@@ -167,7 +189,7 @@ defineExpose({
                         <el-tab-pane label="代码" name="code"></el-tab-pane>
                         <el-tab-pane label="详情" name="detail"></el-tab-pane>
 
-                         <!-- <el-tab-pane label="测试" name="test"></el-tab-pane> -->
+                        <!-- <el-tab-pane label="测试" name="test"></el-tab-pane> -->
                     </el-tabs>
 
 
@@ -186,24 +208,29 @@ defineExpose({
                         </div>
 
                         <div v-show="activeName === 'code'">
-                            <el-radio-group v-model="nodeData.code.type" class="w-full">
+                            <el-radio-group v-model="nodeData.code.mode" class="w-full">
                                 <el-radio label="self">自定义实现</el-radio>
                                 <el-radio label="other">引入其他流</el-radio>
+
+                                <el-select v-if="nodeData.code.mode === 'other'" v-model="nodeData.code.other"
+                                    filterable remote reserve-keyword placeholder="Please enter a keyword"
+                                    :remote-method="remoteMethod">
+                                    <el-option v-for="item in otherProcessLists" :key="item.id" :label="item.basic.name"
+                                        :value="item.id" />
+                                </el-select>
                             </el-radio-group>
-                            <div v-if="nodeData.code.mode === 'self'">
+                            <div v-if="nodeData.code.type === 'self'">
                                 <el-button type="primary" @click="onEditCodeClick">编辑</el-button>
                             </div>
 
-                            <div v-if="nodeData.code.mode === 'other'">
-                                <el-button type="primary">选择</el-button>
-                            </div>
+
                         </div>
 
 
 
                         <div v-show="activeName === 'test'">
 
-                                <processStartParamFormVue ref="paramRef"/>
+                            <processStartParamFormVue ref="paramRef" />
 
                         </div>
 
@@ -213,8 +240,8 @@ defineExpose({
                     </div>
                 </div>
 
-                <el-button type="primary"  v-if="activeName !== 'test'" @click="onConfirmClick">保存</el-button>
-                  <el-button type="primary" v-if="activeName === 'test'" @click="onTestClick">测试</el-button>
+                <el-button type="primary" v-if="activeName !== 'test'" @click="onConfirmClick">保存</el-button>
+                <el-button type="primary" v-if="activeName === 'test'" @click="onTestClick">测试</el-button>
             </div>
 
         </el-drawer>

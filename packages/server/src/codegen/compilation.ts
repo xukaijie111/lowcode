@@ -12,6 +12,10 @@ import {
 import * as _ from 'lodash';
 import { Module } from './module';
 
+import {
+    Mongodb
+} from '../mongo/index'
+
 import MagicString from 'magic-string'
 
 let fse  = require('fs-extra');
@@ -33,16 +37,19 @@ export class Compilation {
     options:Common
     outputPath:string
     plugins:Record<any,any>
+    mongodb:Mongodb
     constructor({
         options,
-        outputPath
+        outputPath,
+        mongodb
     }) {
+        this.mongodb = mongodb;
         let { basic : {name}} = options
         this.outputPath = `${outputPath}/${name}`
         this.options = options;
         this.config = options.config;
         this.modules = [];
-
+        this.mongodb = mongodb
         this.plugins =  { 
             'afterAddModule':[],
             'codeGen':[], // 开始生成目标文件
@@ -75,11 +82,19 @@ export class Compilation {
     }
 
 
+    registerPlugin(name:string,callback:Function) {
+        let plugins = this.plugins[name];
+        if (!plugins) return;
+        plugins.push(callback);
+    }
+
+
     async initPlugins() {
         let plugins = this.options.plugins || [];
         plugins = defaultPlugins.concat(plugins)
+
         plugins.forEach((p)=>{
-        p.apply(this)
+            p.apply(this)
         })
  
   }
@@ -88,6 +103,7 @@ export class Compilation {
     async addModule(m:Module) {
         if (_.find(this.modules,{ id: m.id})) return this
         this.modules.push(m)
+
         await this.callPlugin('afterAddModule',m);
         return this;
     }

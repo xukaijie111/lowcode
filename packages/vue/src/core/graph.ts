@@ -293,17 +293,17 @@ export class mGraph extends Event {
         for (let i = 0; i < nodes.length;i++) {
             let node = nodes[i];
             let { data } = node;
-            let { base,code:{source,type,other} } = data;
+            let { base,code:{source,mode,other} } = data;
             let  { name } = base;
 
-            if (type === "self") {
+            if (mode === "self") {
                 if (!source) {
                     ret.errorMsg = `节点${name}未实现代码功能`
                     return ret;
                 }
             }
 
-            if (type === "other") {
+            if (mode === "other") {
                 if (!other) {
                     ret.errorMsg = `节点${name}未选择实现方式`
                     return ret;
@@ -581,7 +581,7 @@ export namespace mGraph {
         },
         code: {
             source: "export default async function(pipe){}",
-            type:"self",
+            mode:"self",
             other:""
         },
         detail: {

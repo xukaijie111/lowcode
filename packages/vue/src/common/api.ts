@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { request } from '../core/request';
 
 
@@ -75,6 +77,17 @@ export const deployDsl = (id,config) => {
     data : {
         id,
         ...config,
+    }
+  }) 
+}
+
+export const getOtherProcessList = ({ id ,name = "" }) => {
+  return apiRequest({
+    url:'/process/otherProcessList',
+    method:'POST',
+    data : {
+        id,
+        name,
     }
   }) 
 }

@@ -42,7 +42,7 @@ class generateCode{
        modules.forEach((module) => {
         let m_name = module.getName();
         let source = module.getSource();
-        emitFile(`${outputPath}/${m_name}.js`,source)
+        emitFile(`${outputPath}/${m_name}.ts`,source)
        })
 
        this.getenrateExportNamespace();
@@ -52,7 +52,7 @@ class generateCode{
 
     getenrateExportNamespace() {
 
-        let s = new MagicString(`import Pipe from "../../pipe"`)
+        let s = new MagicString(`import { Pipe } from "../../pipe"`)
         s.append('\n')
   
         let { modules,outputPath } = this.compilation;
@@ -97,7 +97,7 @@ class generateCode{
         s.append(`export default pipe`);
   
   
-        emitFile(`${outputPath}/index.js`,s.toString())
+        emitFile(`${outputPath}/index.ts`,s.toString())
   
     }
 

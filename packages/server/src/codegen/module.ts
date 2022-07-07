@@ -35,6 +35,7 @@ export class Module {
         compilation,
         config
     }) {
+        this.source = "";
         this.id = config.id;
         this.compilation = compilation;
         this.config = _.cloneDeep(config);
@@ -42,7 +43,7 @@ export class Module {
         this.init();
         this.ast = getAst(this.getSource());
         this.deps = parseDependency(this.getSource())
-        this.source = ""
+
     }
 
     isStartModule() {
