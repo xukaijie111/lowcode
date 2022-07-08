@@ -45,7 +45,7 @@
     "fs-extra": "^10.0.0"
   },
   "scripts": {
-    "start": "ts-node  ./src/server.ts"
+    "dev": "ts-node  ./src/server.ts"
   },
   "license": "MIT"
 }

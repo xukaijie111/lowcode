@@ -8,6 +8,9 @@ export default defineConfig({
   plugins: [
     vue()
   ],
+  server:{
+    port:3200
+  },
   resolve:{
     alias:{
       '@':resolve(__dirname,'./src'),

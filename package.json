@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "preinstall": "node ./scripts/preinstall.js",
-    "dev:vue": "npm --prefix ./packages/vue run dev",
-    "dev:server": "npm --prefix ./packages/server run start",
-    "dev:editor": "node ./scripts/dev editor",
+    "dev:vue": "node ./scripts/dev.js vue",
+    "dev:server": "node ./scripts/dev.js server",
+    "dev:demo":"node ./scripts/dev.js demo",
+    "dev":"node ./scripts/dev.js",
     "clean": "sudo node ./scripts/clean.js"
   },
   "repository": {

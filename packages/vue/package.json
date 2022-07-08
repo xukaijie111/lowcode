@@ -1,6 +1,5 @@
 {
   "name": "@lowcode/vue",
-  "private": true,
   "version": "0.0.0",
   "main": "dist/es-index.js",
   "types": "dist/index.d.ts",

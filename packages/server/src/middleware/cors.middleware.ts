@@ -4,7 +4,8 @@ import { IResponse } from '../app'
 
 function corsMiddleware(request: Request, response: IResponse, next: NextFunction) {
 
-  response.header("Access-Control-Allow-Origin", "http://localhost:3000")
+  console.log(`request`,request.headers.origin)
+  response.header("Access-Control-Allow-Origin", request.headers.origin)
 
   // res.header('Access-Control-Allow-Origin', '*');
   response.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With');

@@ -87,11 +87,11 @@ const onConfirmClick = async () => {
         // 设置名称
         let data = nodeData.value;
         let { base } = data
-        let { name } = base;
-        if (name) {
+        let {description } = base;
+        if (description) {
             currentNode.value?.attr({
                 label: {
-                    text: name
+                    text: description
                 }
             })
         }

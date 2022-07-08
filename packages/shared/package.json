@@ -1,6 +1,7 @@
 {
   "name": "@lowcode/shared",
   "version": "1.0.0",
+  "private":true,
   "description": "",
   "main": "src/index.ts",
   "module":"dist/cjs-index.js",

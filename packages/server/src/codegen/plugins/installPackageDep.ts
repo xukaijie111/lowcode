@@ -46,7 +46,7 @@ class installPackageDeps{
 
             if (addDeps.length) {
 
-                console.log(`开始安装依赖`)
+                console.log(`开始安装依赖 ${addDeps.join(' ')}`)
                  let  { stdout } =  await execa.command(`cnpm --prefix ${rootOutput} install ${addDeps.join(' ')} --d`);
                 console.log(stdout);  
             }
