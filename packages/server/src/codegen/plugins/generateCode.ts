@@ -116,7 +116,6 @@ class generateCode{
             return true;
           })
 
-        console.log(`####targets is `,targets);
 
         let s = new MagicString('//@ts-nocheck\n')
 
@@ -146,7 +145,7 @@ class generateCode{
         export const call = async (name:string,...args) => {\n
         
             try {\n
-                return await map[name](...args)\n
+                return await map[name].run(...args)\n
             } catch (error) {\n
                 console.log(error)\n
             }\n

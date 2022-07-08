@@ -7,6 +7,7 @@
 2. server 服务端
 3. core 流程调用
 4. shared 公共基础
+5. demo 测试项目
 
 ### 流程编辑使用的是antv/x6 蚂蚁团队的库
 ### 代码编辑使用的是codemirror6
