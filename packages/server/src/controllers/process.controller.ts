@@ -109,7 +109,7 @@ export class ProcessController extends Controller {
 
             return response.ok(null);
         } catch (err) {
-
+            console.log(err)
             return response.fail(`部署失败`)
         }
     }

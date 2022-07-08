@@ -11,3 +11,11 @@ const allTargets = (exports.allTargets = fs.readdirSync('packages').filter(f => 
   }
   return true
 }))
+
+
+const targets =  (exports.targets = fs.readdirSync('packages').filter(f => {
+  if (!fs.statSync(`packages/${f}`).isDirectory()) {
+    return false
+  }
+  return true
+}))

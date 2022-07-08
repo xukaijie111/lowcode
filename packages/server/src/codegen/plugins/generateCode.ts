@@ -8,17 +8,11 @@ import { Compilation } from '../compilation'
 
 import MagicString from 'magic-string'
 
+const relative = require('relative')
+
+let fs = require('fs')
+
 const fse = require('fs-extra')
-/**
- * 
- * [{
- *  src:'',
- *  dest:'',
- * },{
- *  src:''
- *  dest:''
- * }]
- */
 class generateCode{
     compilation:Compilation
     constructor() {
@@ -46,6 +40,8 @@ class generateCode{
        })
 
        this.getenrateExportNamespace();
+
+       this.generateCallFile();
       })
     }
 
@@ -99,6 +95,64 @@ class generateCode{
   
         emitFile(`${outputPath}/index.ts`,s.toString())
   
+    }
+
+
+    generateCallFile() {
+        let { rootOutput } = this.compilation;
+        let dslDirectory = `${rootOutput}/src/dsl`
+        const callPath = `${rootOutput}/src/call.ts`
+
+        let targets = fs.readdirSync(dslDirectory).filter(f => {
+            if (!fs.statSync(`${dslDirectory}/${f}`).isDirectory()) {
+              return false
+            }
+            
+
+            if (!fs.statSync(`${dslDirectory}/${f}/meta.json`).isFile()) {
+                return false
+            }
+
+            return true;
+          })
+
+        console.log(`####targets is `,targets);
+
+        let s = new MagicString('//@ts-nocheck\n')
+
+        let map = {}
+
+        targets.forEach((t) => {
+            let sourcePath = `${dslDirectory}/${t}/index`
+
+            let rel = relative(callPath,sourcePath)
+            if (!/^\./.test(rel)) rel = `./${rel}`;
+
+            let localName = `${t}Pipe`
+            s.append(`import ${localName} from "${rel}"\n`)
+            map[t] = localName
+        })
+
+        s.append('let map = {\n')
+
+        for (let key in map) {
+            let value = map[key]
+            s.append(`"${key}":${value}\n`)
+        }
+
+        s.append('}\n')
+
+        s.append(`
+        export const call = async (name:string,...args) => {\n
+        
+            try {\n
+                return await map[name](...args)\n
+            } catch (error) {\n
+                console.log(error)\n
+            }\n
+        }`)
+
+        emitFile(`${callPath}`,s.toString())
     }
 
 }

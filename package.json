@@ -5,10 +5,9 @@
   "main": "index.js",
   "scripts": {
     "preinstall": "node ./scripts/preinstall.js",
-    "dev:vue": "node ./scripts/dev.js vue",
-    "dev:server": "node ./scripts/dev.js server",
-    "dev:demo":"node ./scripts/dev.js demo",
-    "dev":"node ./scripts/dev.js",
+    "dev:vue": "npm --prefix packages/vue run dev",
+    "dev:server": "sudo npm --prefix packages/server run dev",
+    "dev:demo":"npm --prefix packages/vue demo dev",
     "clean": "sudo node ./scripts/clean.js"
   },
   "repository": {
@@ -34,6 +33,9 @@
     "node": ">=16.5.0"
   },
   "devDependencies": {
+    "axios": "^0.27.2",
+    "element-plus": "^2.2.4",
+    "less": "^4.1.2",
     "@microsoft/api-extractor": "^7.15.1",
     "@rollup/plugin-commonjs": "^18.0.0",
     "@rollup/plugin-json": "^4.0.0",

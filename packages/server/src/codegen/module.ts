@@ -39,8 +39,9 @@ export class Module {
         this.id = config.id;
         this.compilation = compilation;
         this.config = _.cloneDeep(config);
-        this.compilation.addModule(this);
         this.init();
+        
+        this.compilation.addModule(this);
         this.ast = getAst(this.getSource());
         this.deps = parseDependency(this.getSource())
 

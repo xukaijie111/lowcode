@@ -18,7 +18,7 @@ class handleModuleCode{
             module.source = source
           }else {
               let m = new MagicString("");
-              let item = await collect.findOne({id:other})
+              let item = await collect.findOne( { id: other } )
               let otherName = item.basic.name;
               m.append(`import ${otherName} from '../${otherName}/index\n`)
                .append(`export default async function(pipe,...args) {\n`)
