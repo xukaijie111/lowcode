@@ -29,6 +29,7 @@ export class mGraph extends Event {
     }
 
     fromJSON(config:Record<any,any>) {
+        if (!config) return;
         return this.graph.fromJSON(config);
     }
 
@@ -278,11 +279,6 @@ export class mGraph extends Event {
             return now;
         },[])
 
-        if (nodes.length === 1) {
-            ret.errorMsg = `节点数量不足`
-            return ret;
-        }
-
         if (!startNode) {
             ret.errorMsg = `请加入开始节点`
             return ret;
@@ -315,17 +311,12 @@ export class mGraph extends Event {
                 return ret;
             }
 
-            if (!allEdgeNodes.includes(node.id)) {
+            if (allEdgeNodes.length && !allEdgeNodes.includes(node.id)) {
                 ret.errorMsg = `存在节点未连线`
                 return ret;
             }
         }
-           
-    //         if (!allEdgeNodes.includes(node.id)) {
-    //             ret.errorMsg = `有存在未连线的节点`
-    //             return ret;
-    //         }
-    //     }
+        
 
         ret.sucess = true;
         return ret;
@@ -586,7 +577,7 @@ export namespace mGraph {
 
         },
         code: {
-            source: "export default async function(pipe){}",
+            source: "export default async function(pipe){\n\n}",
             mode:"self",
             other:""
         },

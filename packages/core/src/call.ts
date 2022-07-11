@@ -1,6 +1,8 @@
 //@ts-nocheck
+import dataflowPipe from "./dsl/dataflow/index"
 import testPipe from "./dsl/test/index"
 let map = {
+"dataflow":dataflowPipe
 "test":testPipe
 }
 

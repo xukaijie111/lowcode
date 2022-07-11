@@ -1,0 +1,6 @@
+{
+	"name": "start",
+	"description": "获取key/value",
+	"type": "start",
+	"next": null
+}

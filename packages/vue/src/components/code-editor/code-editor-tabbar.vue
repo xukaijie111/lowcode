@@ -36,10 +36,14 @@ const handleCurrentTab = (item: ListItem) => {
 const update = () => {
 
   for (let i = 0; i < opendItems.value.length;i++) {
-    if (!_.find(props.lists,{ id: opendItems.value[i].id})) {
-      opendItems.value.splice(i,1);
-      i--;
+    let item = _.find(props.lists,{ id: opendItems.value[i].id})
+    if (!item) {
+        opendItems.value.splice(i,1);
+        i--;
+        continue;
     }
+
+    opendItems.value[i] = _.cloneDeep(item);
 
   }
 }
@@ -47,7 +51,8 @@ const update = () => {
 const addItem = (id: string) => {
   if (!_.find(opendItems.value, { id })) {
     let item = _.find(props.lists, { id}) as ListItem;
-    opendItems.value.push(item);
+
+    opendItems.value.push(_.cloneDeep(item));
   }
 }
 

@@ -179,7 +179,6 @@ const open = async (id: string) => {
     dialogVisible.value = true
     await nextTick();
     activeId.value = id;
-    sideBarRef.value.update();
 }
 
 const onCloseDialog = async () => {
