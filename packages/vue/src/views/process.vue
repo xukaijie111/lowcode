@@ -12,7 +12,6 @@ import { ElMessage,ElMessageBox } from 'element-plus'
 
 const router = useRouter();
 
-const baseRef = ref();
 
 let query = ref({
     name:""
@@ -90,7 +89,7 @@ const handleCurrentChange = (val:number) => {
     console.log(`###val is `, val)
 }
 
-const onDeployClick = async (id) => {
+const onDeployClick = async (id:string) => {
     await deployById(id);
     ElMessage.success(`部署成功`);
 }
