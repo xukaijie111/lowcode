@@ -47,7 +47,7 @@ export class ProcessController extends Controller {
         let { body } = request;
         // 新增检查名称有重复的没有
         if (!body.id) {
-            let { name } = body;
+            let { basic:{ name }  } = body;
 
             if (await this.collect.findOne({ name })) {
                 return response.fail(`${name} 已经存在`)
@@ -73,6 +73,7 @@ export class ProcessController extends Controller {
     }
 
     private async saveDsl(raw)  {
+        if (!raw.config) return;
         let { config } = raw;
         let nodesNum = getNodes(config.cells || []).length;
         raw.nodesNum = nodesNum;
@@ -86,7 +87,7 @@ export class ProcessController extends Controller {
         try {
             let ret = await this._depoly(request.body)
             if (!ret.success) {
-                return response.fail(ret)
+                return response.fail(ret.errorMsg)
             }
               // 保存x6 config
               await this.saveDsl(request.body);
@@ -107,7 +108,7 @@ export class ProcessController extends Controller {
 
             let ret = await this._depoly(detail)
             if (!ret.success) {
-                return response.fail(ret)
+                return response.fail(ret.errorMsg)
             }
 
             return response.ok(null)

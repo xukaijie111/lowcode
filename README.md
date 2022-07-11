@@ -29,7 +29,7 @@
 ```js
 import { dslCall } from "@lowcode/core";
 
-// 格式:await call(流程名,参数1,参数2....)
+// 格式:await dslCall(流程名,参数1,参数2....)
 
 await dslCall('test',1,2)
 
@@ -45,7 +45,7 @@ export async function(pipe,...args) {
 ```
 
 ### 使用
-1. 系统需要安装Mongodb，开启mongofb服务，27017端口，无密码
+1. 系统需要安装Mongodb，开启mongodb服务，27017端口，无密码
 2. 开启server服务  npm run dev:server
 3. 开启vue管理  npm run dev:vue   该项目对流程进行管理
 4. 开启demo  npm run demo:vue    该项目对流程进行测试
