@@ -18,9 +18,9 @@ import {
     run
 } from '../core/run'
 
-import {
-    getOtherProcessList
-} from '../common/api'
+// import {
+//     getOtherProcessList
+// } from '../common/api'
 
 let props = defineProps<
     {
@@ -52,7 +52,7 @@ const baseRef = ref();
 const codeEditorRef = ref();
 const paramRef = ref();
 
-const otherProcessLists = ref();
+//const otherProcessLists = ref();
 
 const handleClickTab = (tab: TabsPaneContext, event: Event) => {
     event.stopPropagation();
@@ -156,20 +156,20 @@ const onTestClick = async () => {
     await run(name);
 }
 
-const remoteMethod = async (name: string) => {
-    try {
-        let ret = await getOtherProcessList({
-            id: props.id,
-            name
-        })
-        otherProcessLists.value = ret;
+// const remoteMethod = async (name: string) => {
+//     try {
+//         let ret = await getOtherProcessList({
+//             id: props.id,
+//             name
+//         })
+//         otherProcessLists.value = ret;
 
-    } catch (err) {
+//     } catch (err) {
 
-    }
+//     }
 
 
-}
+// }
 defineExpose({
     open
 })
@@ -208,7 +208,7 @@ defineExpose({
                         </div>
 
                         <div v-show="activeName === 'code'">
-                            <el-radio-group v-model="nodeData.code.mode" class="w-full">
+                            <!-- <el-radio-group v-model="nodeData.code.mode" class="w-full">
                                 <el-radio label="self">自定义实现</el-radio>
                                 <el-radio label="other">引入其他流</el-radio>
 
@@ -221,7 +221,9 @@ defineExpose({
                             </el-radio-group>
                             <div v-if="nodeData.code.mode === 'self'">
                                 <el-button type="primary" @click="onEditCodeClick">编辑</el-button>
-                            </div>
+                            </div> -->
+
+                            <el-button type="primary" class="mt-20" @click="onEditCodeClick">编辑</el-button>
 
 
                         </div>

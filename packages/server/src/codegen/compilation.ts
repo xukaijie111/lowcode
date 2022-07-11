@@ -153,8 +153,8 @@ export class Compilation {
                 if (downPort) {
                     let targetModule = this.getNextModule(module, downPort.id);
                     if (targetModule) {
-                        meta.next = targetModule.getDsl();
-                        deepMetaData(targetModule, meta.next)
+                        meta.elseNext = targetModule.getDsl();
+                        deepMetaData(targetModule, meta.elseNext)
                     }
                 }
             }

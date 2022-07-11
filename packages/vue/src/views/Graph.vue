@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref, nextTick } from 'vue';
+import { onMounted, ref, nextTick,watch } from 'vue';
 import { mGraph } from '../core/graph'
 import x6MainVue from '../components/x6-main.vue';
 import x6StencilVue from '../components/x6-stencil.vue';
@@ -9,6 +9,7 @@ import _ from 'lodash'
 import { useRoute } from 'vue-router'
 import { createProcess, getProcessDetail, saveDsl,deployDsl } from '../common/api'
 import { ElMessage } from 'element-plus';
+
 
 
 const route = useRoute();
@@ -23,6 +24,12 @@ let data = ref({
     description: ""
 })
 let id = ref();
+
+watch( () => {
+    return data.value
+},(newValue) => {
+    document.title = newValue.name
+})
 
 const onConfirmProcessBasicInfo = async (_data: unknown) => {
     //@ts-ignore
@@ -44,6 +51,8 @@ const createGraph = async (options = {}) => {
 
 }
 
+
+
 const onConfirmDialog = async (_data: unknown) => {
 
     //@ts-ignore
@@ -57,6 +66,7 @@ const onConfirmDialog = async (_data: unknown) => {
     createGraph();
 
     mgraph.value?.setData(data.value);
+   
 }
 
 const create = async () => {
@@ -71,7 +81,6 @@ const _getProcessDetail = async () => {
     data.value = basic;
     mgraph.value?.fromJSON(config);
     mgraph.value?.setData(basic)
-
 }
 
 const editUrl = () => {

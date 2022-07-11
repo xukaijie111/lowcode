@@ -2,8 +2,8 @@
 import dataflowPipe from "./dsl/dataflow/index"
 import testPipe from "./dsl/test/index"
 let map = {
-"dataflow":dataflowPipe
-"test":testPipe
+"dataflow":dataflowPipe,
+"test":testPipe,
 }
 
         export const dslCall = async (name:string,...args) => {

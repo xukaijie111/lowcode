@@ -82,7 +82,8 @@ const onMultDeleteClick = async (rows: Array<unknown>) => {
 
 const handleDetail = (row:Record<any,any>) => {
   let { id } = row;
-  router.push(`/graph/${id}`)
+  let s = router.resolve(`/graph/${id}`)
+    window.open(s.href,"_blank")
 }
 
 const handleCurrentChange = (val:number) => {

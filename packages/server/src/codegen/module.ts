@@ -103,8 +103,8 @@ export class Module {
     getDownport() {
         let { config } = this;
         let { ports: { items } } = config;
-        let rightPort = _.find(items, { group: 'down' });
-        return rightPort;
+        let Port = _.find(items, { group: 'bottom' });
+        return Port;
     }
 
     getFunctionName() {

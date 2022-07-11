@@ -138,7 +138,7 @@ class generateCode{
 
         for (let key in map) {
             let value = map[key]
-            s.append(`"${key}":${value}\n`)
+            s.append(`"${key}":${value},\n`)
         }
 
         s.append('}\n')
