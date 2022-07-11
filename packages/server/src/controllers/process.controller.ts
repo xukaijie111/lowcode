@@ -73,10 +73,12 @@ export class ProcessController extends Controller {
     }
 
     private async saveDsl(raw)  {
-        if (!raw.config) return;
-        let { config } = raw;
-        let nodesNum = getNodes(config.cells || []).length;
-        raw.nodesNum = nodesNum;
+        if (raw.config)  {
+            let { config } = raw;
+            let nodesNum = getNodes(config.cells || []).length;
+            raw.nodesNum = nodesNum;
+        }
+      
         let id = await super.edit(raw)
         return id;
     }
