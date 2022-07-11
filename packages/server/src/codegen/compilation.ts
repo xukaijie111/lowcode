@@ -21,7 +21,7 @@ import MagicString from 'magic-string'
 let fse  = require('fs-extra');
 
 import {
-    checkCodeInValid, emitFile
+    checkCodeInValid, getNodes
 } from '../common/util'
 
 const defaultPlugins = require('./plugins/index')
@@ -60,7 +60,7 @@ export class Compilation {
 
         this.initPlugins();
 
-        let nodes = this.getNodes();
+        let nodes = getNodes(this.config.cells || []);
         nodes.forEach((n) => {
             new Module({
                 compilation:this,
@@ -112,14 +112,6 @@ export class Compilation {
         return this;
     }
 
-
-    getNodes() {
-        let { cells } = this.config;
-        return cells.filter((c:Common) => {
-            let values = Object.values(NodeShape);
-            return values.includes(c.shape);
-        })
-    }
 
     getNextModule(module:Module,portId:string) {
         let { config ,modules} = this;
@@ -179,7 +171,7 @@ export class Compilation {
 
 
     checkSource() {
-        let nodes = this.getNodes();
+        let nodes = getNodes(this.config.cells || []);
         for (let i = 0; i < nodes.length; i++) {
             let node = nodes[i];
             let { data: { code: { source }, base: { name } } } = node;

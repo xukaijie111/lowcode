@@ -54,7 +54,7 @@ export class Controller {
         if (!id) id = generateId();
     
         let setOnInsert = {
-             ctime: Date.now(),beUsedNum:0, importOtherProcessNum:0
+             ctime: Date.now()
         }
     
         let set = _.omit(data,Object.keys(setOnInsert))

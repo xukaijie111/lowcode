@@ -8,23 +8,30 @@ type Common =  Record<any,any>
 export class  Pipe {
     meta:Common
     map:Common
+    data:Common
     constructor(options:Pipe.options) {
         this.map = options.map;
         this.meta = options.meta
+        this.data = {}
     }
 
-    async run() {
-        let meta = this.meta;
-
-        let result 
-
-        while(true) {
-
+    async run(...args) {
+       
+        let result
+        const _run = async (_meta:Common) => {
+            let meta = _meta;
+            if (!meta) return;
             let { name }  = meta;
             let exec  = this.getFunctionByName(name)
-            if (!exec) break;
+            if (!exec) return;
             console.log(`\n\n开始运行节点${name}`)
-            let ret:unknown = await exec(this,result)
+            let ret:unknown
+            if (this.isStartNode(meta)) {
+                ret =  await exec(this,...args)
+            }else {
+                ret =  await exec(this,result)
+            }
+        
             console.log(`节点${name}运行结束`)
             if (this.isCheckNode(meta)) {
                 if (ret) meta = meta.next;
@@ -36,11 +43,15 @@ export class  Pipe {
    
             if (!meta){
                 console.log(`节点${name} 无下一个节点了`)
-                break;
+                return;
             } 
 
+            await _run(meta)
         }
 
+        await _run(this.meta);
+
+        return result;
     }
 
 
@@ -51,6 +62,21 @@ export class  Pipe {
 
     isCheckNode(meta:Common) {
         return meta.type === NodeType.CHECK
+    }
+
+    isStartNode(meta:Common) {
+        return meta.type === NodeType.START
+    }
+
+
+    setData(key:string,value:unknown) {
+        if (!key) return this;
+        this.data[key] = value;
+        return this;
+    }
+
+    getData(key:string) {
+        return this.data[key]
     }
 }
 

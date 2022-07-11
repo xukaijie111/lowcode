@@ -3,6 +3,16 @@
 import { parse } from "@babel/parser"
 import traverse from "@babel/traverse"
 
+import {
+  NodeShape,
+  NodeType,
+  CheckNodeMetaData,
+  StartNodeMetaData,
+  EndNodeMetaData,
+  CommonNodeMetaData,
+  NodeMetaData
+} from '@lowcode/shared'
+
 let fse  = require('fs-extra');
 
 
@@ -73,4 +83,12 @@ export const checkCodeInValid = (source:string) => {
 export function emitFile(path:string, code:string) {
   fse.removeSync(path);
   fse.outputFileSync(path, code);
+}
+
+export  function getNodes (cells) {
+
+  return cells.filter((c) => {
+      let values = Object.values(NodeShape);
+      return values.includes(c.shape);
+  })
 }

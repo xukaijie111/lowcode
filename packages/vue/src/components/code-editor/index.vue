@@ -89,7 +89,7 @@ const flushToNode = (id?: string | Array<string>) => {
         id = [id];
     }
 
-    let ret = []
+    let ret:Array<Record<any,any>> = []
     for (let i = 0; i < id.length; i++) {
         let item = mapCache.value.get(id[i]) as MapValue;
         item.dirty = false;
@@ -179,6 +179,7 @@ const open = async (id: string) => {
     dialogVisible.value = true
     await nextTick();
     activeId.value = id;
+    sideBarRef.value.update();
 }
 
 const onCloseDialog = async () => {

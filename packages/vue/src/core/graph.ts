@@ -469,7 +469,13 @@ export namespace mGraph {
         },
         history:{
             enabled:true
-        }
+        },
+        // interacting:function(){
+        //     return true
+        //     return {
+        //         vertexDeletable:true
+        //     }
+        // }
     }
 
     export const defaultStencilOptions = {

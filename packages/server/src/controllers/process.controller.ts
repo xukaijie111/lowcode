@@ -3,21 +3,15 @@ import { Mongodb } from '../mongo/index'
 import { IResponse } from '../app'
 import * as _ from 'lodash'
 import { Controller } from './base.controller';
-import {
-    NodeShape,
-    NodeType,
-    CheckNodeMetaData,
-    StartNodeMetaData,
-    EndNodeMetaData,
-    CommonNodeMetaData,
-    NodeMetaData
-} from '@lowcode/shared'
 
-import { parseDependency, checkCodeInValid, emitFile } from '../common/util'
 
 import {
     Compilation
 } from '../codegen/compilation'
+
+import {
+    getNodes
+} from '../common/util'
 
 let path = require('path')
 let dslRoot = path.resolve(__dirname, '../../../core')
@@ -40,6 +34,7 @@ export class ProcessController extends Controller {
         this.router.post(`${this.path}/detail`, this.getDetail);
         this.router.post(`${this.path}/delete`, this.processDelete);
         this.router.post(`${this.path}/deploy`, this.deployDsl);
+        this.router.post(`${this.path}/deployById`, this.deployById);
         this.router.post(`${this.path}/otherProcessList`, this.getOtherProcessList)
     }
 
@@ -59,7 +54,7 @@ export class ProcessController extends Controller {
             }
         }
 
-        let id = await super.edit(request.body);
+        let id = await this.saveDsl(request.body);
         return response.ok(id);
 
     }
@@ -77,10 +72,56 @@ export class ProcessController extends Controller {
         return response.ok(null);
     }
 
+    private async saveDsl(raw)  {
+        let { config } = raw;
+        let nodesNum = getNodes(config.cells || []).length;
+        raw.nodesNum = nodesNum;
+        let id = await super.edit(raw)
+        return id;
+    }
+
 
     private deployDsl = async (request: Request, response: IResponse, next: NextFunction) => {
 
-        let { config, basic } = request.body;
+        try {
+            let ret = await this._depoly(request.body)
+            if (!ret.success) {
+                return response.fail(ret)
+            }
+              // 保存x6 config
+              await this.saveDsl(request.body);
+
+              return response.ok(null);
+        } catch (error) {
+            console.log(error)
+            return response.fail(`部署失败`)
+        }
+    }
+
+
+    private deployById = async (request: Request, response: IResponse, next: NextFunction) => {
+
+        try {
+
+            let detail = super.detail(request.body);
+
+            let ret = await this._depoly(detail)
+            if (!ret.success) {
+                return response.fail(ret)
+            }
+
+            return response.ok(null)
+
+        } catch (error) {
+            console.log(error)
+            return response.fail(`部署失败`)
+        }
+      
+
+    }
+
+    private async _depoly(raw) {
+        let { config, basic } = raw
 
         let options = {
             config,
@@ -95,23 +136,27 @@ export class ProcessController extends Controller {
             })
 
             let ret = compilation.checkSource();
-            if (ret) {
-                return response.fail(ret)
-            }
-
+            if(ret)
+                return {
+                    success:false,
+                    errorMsg:ret
+                }
+           
 
 
 
             await compilation.run();
 
-            // 保存x6 config
-            await super.edit(request.body);
-
-            return response.ok(null);
+            return {
+                success:true
+            }
         } catch (err) {
             console.log(err)
-            return response.fail(`部署失败`)
+           return {
+            success:true
+           }
         }
+
     }
 
 

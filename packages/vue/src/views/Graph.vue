@@ -9,6 +9,7 @@ import _ from 'lodash'
 import { useRoute } from 'vue-router'
 import { createProcess, getProcessDetail, saveDsl,deployDsl } from '../common/api'
 import { ElMessage } from 'element-plus';
+import { Edge } from '@antv/x6';
 
 
 const route = useRoute();
@@ -40,7 +41,7 @@ const createGraph = async (options = {}) => {
 
     (mgraph.value as mGraph).on("node:dblclick", (param) => {
         editor.value.open(param);
-    })
+    });
 
 }
 

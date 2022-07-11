@@ -3,9 +3,15 @@
 	"description": "start",
 	"type": "start",
 	"next": {
-		"name": "console",
-		"description": "打印测试",
-		"type": "common",
-		"next": null
+		"name": "checkAgeIsBigger",
+		"description": "判断年龄是否大于15",
+		"type": "check",
+		"next": {
+			"name": "console",
+			"description": "打印测试",
+			"type": "common",
+			"next": null
+		},
+		"elseNext": null
 	}
 }

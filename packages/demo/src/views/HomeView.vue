@@ -2,7 +2,10 @@
 
 import { dslCall } from '@lowcode/core'
 
-dslCall('test');
+dslCall('test',18)
+.then((res) => {
+  console.log(`###res is `,res)
+})
 
 </script>
 

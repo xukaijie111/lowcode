@@ -91,3 +91,13 @@ export const getOtherProcessList = ({ id ,name = "" }) => {
     }
   }) 
 }
+
+export const deployById = (id) => {
+  return apiRequest({
+    url:'/process/deployById',
+    method:'POST',
+    data : {
+        id
+    }
+  })
+}

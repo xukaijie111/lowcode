@@ -1,0 +1,9 @@
+.x6-edge:hover path{
+    stroke: #1890ff;
+    stroke-width: 1.5px;
+  }
+  
+  .x6-edge-selected path{
+    stroke: #1890ff;
+    stroke-width: 1.5px !important;
+  }
