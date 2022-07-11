@@ -43,6 +43,7 @@ export async function(pipe,...args) {
 
 }
 ```
+其中pipe永远在第一个位置，pipe是一个流程中共享的全局类，每次开始的时候，会new 一个pipe。你可以调用pipe的函数，进行一些全局变量的设置，可以让流程里的所有节点都访问到
 
 ### 使用
 1. 系统需要安装Mongodb，开启mongofb服务，27017端口，无密码
@@ -50,4 +51,4 @@ export async function(pipe,...args) {
 3. 开启vue管理  npm run dev:vue   该项目对流程进行管理
 4. 开启demo  npm run demo:vue    该项目对流程进行测试
 
-其中pipe永远在第一个位置，pipe是一个流程中共享的全局类，每次开始的时候，会new 一个pipe。你可以调用pipe的函数，进行一些全局变量的设置，可以让流程里的所有节点都访问到
+
