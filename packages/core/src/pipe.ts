@@ -23,7 +23,9 @@ export class  Pipe {
             let { name }  = meta;
             let exec  = this.getFunctionByName(name)
             if (!exec) break;
+            console.log(`\n\n开始运行节点${name}`)
             let ret:unknown = await exec(this,result)
+            console.log(`节点${name}运行结束`)
             if (this.isCheckNode(meta)) {
                 if (ret) meta = meta.next;
                 else meta = meta.elseNext;
@@ -32,7 +34,10 @@ export class  Pipe {
                 meta = meta.next;
             }
    
-            if (!meta) break;
+            if (!meta){
+                console.log(`节点${name} 无下一个节点了`)
+                break;
+            } 
 
         }
 

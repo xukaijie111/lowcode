@@ -7,7 +7,7 @@
     "preinstall": "node ./scripts/preinstall.js",
     "dev:vue": "npm --prefix packages/vue run dev",
     "dev:server": "sudo npm --prefix packages/server run dev",
-    "dev:demo":"npm --prefix packages/vue demo dev",
+    "dev:demo":"npm --prefix packages/demo run dev",
     "clean": "sudo node ./scripts/clean.js"
   },
   "repository": {

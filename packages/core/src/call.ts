@@ -4,12 +4,12 @@ let map = {
 "test":testPipe
 }
 
-        export const call = async (name:string,...args) => {
+        export const dslCall = async (name:string,...args) => {
 
         
             try {
 
-                return await map[name](...args)
+                return await map[name].run(...args)
 
             } catch (error) {
 

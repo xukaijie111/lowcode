@@ -42,6 +42,8 @@ class generateCode{
        this.getenrateExportNamespace();
 
        this.generateCallFile();
+
+       console.log(`###代码生成完成`)
       })
     }
 
@@ -142,7 +144,7 @@ class generateCode{
         s.append('}\n')
 
         s.append(`
-        export const call = async (name:string,...args) => {\n
+        export const dslCall = async (name:string,...args) => {\n
         
             try {\n
                 return await map[name].run(...args)\n

@@ -27,11 +27,11 @@
 ### core系统
 该子包可供业务方调用生成的dsl流程，通过core提供的接口进行调用
 ```js
-import { call } from "@lowcode/core";
+import { dslCall } from "@lowcode/core";
 
 // 格式:await call(流程名,参数1,参数2....)
 
-await call('test',1,2)
+await dslCall('test',1,2)
 
 ```
 
