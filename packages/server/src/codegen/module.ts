@@ -31,6 +31,7 @@ export class Module {
     deps:Array<string>
     meta:NodeMetaData
     source:string
+    outputPath:string
     constructor({
         compilation,
         config
@@ -39,6 +40,7 @@ export class Module {
         this.id = config.id;
         this.compilation = compilation;
         this.config = _.cloneDeep(config);
+
         this.init();
         
         this.compilation.addModule(this);
@@ -60,9 +62,17 @@ export class Module {
     }
 
     init() {
-        // let { config } = this;
-        // let { data :{code : { source }} }= config;
-        // config.data.code.raw_source = source;
+
+        let { compilation,config } = this;
+
+        let name = config.data.base.name;
+
+        this.outputPath = `${compilation.outputPath}/${name}.ts`
+
+    }
+
+    getOuptPutPath () {
+        return this.outputPath
     }
 
     getSource() {

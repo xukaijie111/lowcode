@@ -39,6 +39,7 @@ export class Compilation {
     plugins:Record<any,any>
     mongodb:Mongodb
     rootOutput:string
+    dslPath:string
     constructor({
         options,
         outputPath,
@@ -47,6 +48,7 @@ export class Compilation {
         this.mongodb = mongodb;
         let { basic : {name}} = options
         this.rootOutput = outputPath;
+        this.dslPath =  `${outputPath}/src/dsl`
         this.outputPath = `${outputPath}/src/dsl/${name}`
         this.options = options;
         this.config = options.config;
@@ -181,6 +183,10 @@ export class Compilation {
             }
         }
 
+    }
+
+    resolveDslPath(name) {
+        return `${this.dslPath}/${name}`
     }
 
 }

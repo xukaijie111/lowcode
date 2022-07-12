@@ -156,7 +156,8 @@ export class ProcessController extends Controller {
         } catch (err) {
             console.log(err)
            return {
-            success:true
+            success:false,
+            errorMsg:"部署失败"
            }
         }
 

@@ -34,9 +34,8 @@ class generateCode{
         emitFile(`${outputPath}/meta.json`,JSON.stringify(meta,'','\t'));
 
        modules.forEach((module) => {
-        let m_name = module.getName();
         let source = module.getSource();
-        emitFile(`${outputPath}/${m_name}.ts`,source)
+        emitFile(`${module.getOuptPutPath()}`,source)
        })
 
        this.getenrateExportNamespace();
@@ -93,7 +92,8 @@ class generateCode{
         
   
         s.append(`export default pipe`);
-  
+        
+
   
         emitFile(`${outputPath}/index.ts`,s.toString())
   

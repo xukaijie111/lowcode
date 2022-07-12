@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/server.ts",
   "dependencies": {
+    "@babel/template": "^7.18.6",
     "@types/bcrypt": "^3.0.0",
     "@types/body-parser": "^1.19.2",
     "@types/node": "^18.0.0",
