@@ -1,0 +1,10 @@
+{
+	"name": "start",
+	"type": "start",
+	"next": {
+		"name": "operateCart",
+		"description": "操作购物车",
+		"type": "common",
+		"next": null
+	}
+}
