@@ -284,6 +284,10 @@ export class mGraph extends Event {
             return ret;
         }
         
+        if (nodes.length > 1 && !edges.length) {
+            ret.errorMsg = `存在节点未连线`
+            return ret;
+        }
 
         // 判断有没有节点没连线的
         for (let i = 0; i < nodes.length;i++) {

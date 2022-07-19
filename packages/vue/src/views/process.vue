@@ -10,6 +10,10 @@ import { getProcessList, deleteProcess ,deployById} from '../common/api'
 import _ from 'lodash'
 import { ElMessage,ElMessageBox } from 'element-plus'
 
+import {
+    formatTime
+} from '../common/util'
+
 const router = useRouter();
 
 
@@ -137,6 +141,13 @@ onMounted(() => {
                 <el-table-column  label = "描述">
                     <template #default="scope">
                             {{scope.row.basic.description}}
+
+                    </template>
+                </el-table-column>
+
+                 <el-table-column  label = "部署时间">
+                    <template #default="scope">
+                          {{formatTime(scope.row.mtime)}}
 
                     </template>
                 </el-table-column>

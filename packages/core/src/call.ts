@@ -1,8 +1,10 @@
 //@ts-nocheck
 import dataflowPipe from "./dsl/dataflow/index"
+import getProductsPipe from "./dsl/getProducts/index"
 import testPipe from "./dsl/test/index"
 let map = {
 "dataflow":dataflowPipe,
+"getProducts":getProductsPipe,
 "test":testPipe,
 }
 

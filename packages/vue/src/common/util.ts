@@ -1,5 +1,6 @@
 
 
+
 //@ts-nocheck
 export function throttle(func, wait, options) {
     var timeout, context, args, result;
@@ -65,3 +66,21 @@ export function throttle(func, wait, options) {
     // 返回一个闭包
     return debounced;
   };
+
+  export const formatTime = (time:TimeStamp,split = "/") => {
+    let date = new Date(time);
+    const year = date.getFullYear()
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+    const hour = date.getHours()
+    const minute = date.getMinutes()
+    const second = date.getSeconds()
+  
+    return `${[year, month, day].map(formatNumber).join(split)} ${[hour, minute, second].map(formatNumber).join(':')}`
+  }
+  
+  const formatNumber = n => {
+    n = n.toString()
+    return n[1] ? n : `0${n}`
+  }
+  

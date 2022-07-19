@@ -9,6 +9,8 @@ import { EditorView, keymap } from '@codemirror/view';
 import { basicSetup } from 'codemirror';
 import { indentWithTab } from '@codemirror/commands';
 import { javascript } from "@codemirror/lang-javascript"
+import {autocompletion} from "@codemirror/autocomplete"
+
 import { onMounted } from 'vue';
 
 
@@ -21,6 +23,24 @@ let emits = defineEmits<{
 
 let view: EditorView; // 不能用ref定义，内部的值会被proxyed ,影响codemirror里面相关代码判断
 
+
+// Our list of completions (can be static, since the editor
+/// will do filtering based on context).
+const completions = [
+  {label: "dslProcess", type: "keyword"},
+]
+
+function myCompletions(context) {
+  let before = context.matchBefore(/\w+/)
+  // If completion wasn't explicitly started and there
+  // is no word before the cursor, don't open completions.
+  if (!context.explicit && !before) return null
+  return {
+    from: before ? before.from : context.pos,
+    options: completions,
+    validFor: /^\w*$/
+  }
+}
 
 function Keymap() {
     return keymap.of([{
@@ -48,6 +68,8 @@ const getExtensions = () => {
         Keymap(),
 
         keymap.of([indentWithTab]),
+
+       // autocompletion({override: [myCompletions]})
     ]
 
     return extensions;

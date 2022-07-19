@@ -1,0 +1,10 @@
+{
+	"name": "start",
+	"type": "start",
+	"next": {
+		"name": "getGoodsList",
+		"description": "获取分页衣服列表",
+		"type": "common",
+		"next": null
+	}
+}
