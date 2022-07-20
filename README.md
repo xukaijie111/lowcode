@@ -34,6 +34,8 @@ import { dslCall } from "@lowcode/core";
 await dslCall('test',1,2)
 
 ```
+![image](./images/demo.png)
+
 
 
 ### 节点函数

@@ -27,12 +27,12 @@ export default async function(pipe,param){
       
       let exit = _.find(cart.list,{ id: item.id});
 
-      
+      console.log(`###add is `,exit);
       if (exit) {
         exit.number += item.number
         if (!(exit.number > 0)) {
           let index = _.findIndex(cart.list,{ id: item.id});
-          cart.let.splice(index,1)
+          cart.list.splice(index,1)
         }
       }else {
         cart.list.push(_.cloneDeep(item));
@@ -40,7 +40,7 @@ export default async function(pipe,param){
 
       cart.total = cart.list.reduce((prev,now) => {
           now.number = Math.max(0,now.number);
-          return now.number * now.price
+          return now.number * now.price+prev
       },0)
 
       return _.cloneDeep(cart)

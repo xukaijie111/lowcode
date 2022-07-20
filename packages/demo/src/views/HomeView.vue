@@ -10,12 +10,47 @@ let page = ref({
 
 let list = ref<Record<any, any>>([])
 
-dslCall('getProducts', page.value)
-  .then((res) => {
-    list.value = res.list;
-    console.log(`###list is`, list.value);
-  })
+let cart = ref<Record<any, any>>()
 
+const cartNum = ref(0)
+
+const getProductsList = async function() {
+  let res = await dslCall('getProducts', page.value);
+   list.value = res.list;
+}
+
+
+const getCarts = async function() {
+  let cart = await dslCall(`cartManage`, {op:'list'})
+  cart.value = cart;
+}
+
+
+const addCart = async function(item:Record<any,any>) {
+   let _cart = await dslCall(`cartManage`, {op:'add',item:{...item,number:1}})
+
+  cart.value = _cart;
+
+     console.log(`###cart is`,cart)
+
+}
+
+
+getProductsList();
+getCarts();
+
+const getCartNumber = () => {
+  let list = cart.value?.list || [];
+  let number = 0;
+  //@ts-ignore
+  number = list.reduce((prev,now) => {
+
+    return prev + now.number
+  },0)
+
+  return number;
+
+}
 
 const getItemSrc = (item: Record<any, any>) => {
   let { image } = item;
@@ -33,18 +68,16 @@ const getItemSrc = (item: Record<any, any>) => {
       <div class="item" v-for="item in list">
         <img :src="getItemSrc(item)" class="header" />
         <p class="description">{{ item.description }}</p>
-        <p class="price-wrap"><small>￥</small><b>25</b><span>.90</span></p>
-        <button tabindex="-1" class="addCart">Add to cart</button>
+        <p class="price-wrap"><small>￥</small><b>{{item.price/1000}}</b></p>
+        <button tabindex="-1" class="addCart" @click.stop = "addCart(item)">Add to cart</button>
       </div>
     </div>
 
-    <div class="cart-wrap">
       <button class="cart-btn">
         <div class="cart-icon">
-          <div title="Products in cart quantity" class="cart">0</div>
+          <div title="Products in cart quantity" class="cart">{{getCartNumber()}}</div>
         </div>
       </button>
-    </div>
 
   </div>
 </template>
@@ -57,19 +90,13 @@ const getItemSrc = (item: Record<any, any>) => {
   margin-top: 30px;
   overflow: auto;
 
-  .cart-wrap {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 100%;
-    height: 100%;
-    background-color: #1b1a20;
-    box-sizing: border-box;
-    z-index: 99;
-    -webkit-transition: right 0.2s;
-    transition: right 0.2s;
+
+
 
     .cart-btn {
+       position: fixed;
+    top: 20px;
+    right: 50px;
       border: 0;
       padding: 0;
       width: 50px;
@@ -79,8 +106,6 @@ const getItemSrc = (item: Record<any, any>) => {
       text-align: center;
       line-height: 50px;
       position: absolute;
-      top: 0;
-      left: 0;
       cursor: pointer;
       z-index: 2;
 
@@ -114,7 +139,7 @@ const getItemSrc = (item: Record<any, any>) => {
         }
       }
     }
-  }
+ 
 
   .list-wrap {
     width: 900px;
@@ -122,7 +147,7 @@ const getItemSrc = (item: Record<any, any>) => {
     align-items: center;
     justify-content: space-around;
     flex-wrap: wrap;
-
+    padding-bottom: 200px;
     .item {
 
       margin-right: 20px;
